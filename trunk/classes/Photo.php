@@ -23,6 +23,7 @@ class Photo {
     private $geo;
     private $thumbnail_url;
     private $fullsize_url;
+    private $rrDistance;
 
 
     /*
@@ -76,9 +77,9 @@ class Photo {
         $this->views = $args["views"];
         $this->tags = $args["tags"];
 
-         // acc = 0 => this means no geo is given by the author => invalid geo ( , , true)
-         $this->geo = new Geo($args["latitude"], $args["longitude"], $args["accuracy"] == 0);
-        
+        // acc = 0 => this means no geo is given by the author => invalid geo ( , , true)
+        $this->geo = new Geo($args["latitude"], $args["longitude"], $args["accuracy"] == 0);
+
         $this->thumbnail_url = $args["url_t"];
         $this->fullsize_url = $this->createFullsizeUrl();
     }
@@ -184,6 +185,14 @@ class Photo {
 
     public function setFullsizeUrl($fullsize_url) {
         $this->fullsize_url = $fullsize_url;
+    }
+
+    public function getRrDistance() {
+        return $this->rrDistance;
+    }
+
+    public function setRrDistance($rrDistance) {
+        $this->rrDistance = $rrDistance;
     }
 
 }
