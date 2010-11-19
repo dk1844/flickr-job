@@ -2,11 +2,19 @@
     <input name="input" type="text" value="{inputText}" /><input type="submit" value="search" name="search" />
     {searchTypeSelector}
 
-    &nbsp; |  &nbsp;
+    <fieldset>
+        <legend>
+            <input type="checkbox" name="rerank" value="rerank" id="rerank_cb" {rerank_selected} /><label for="rerank_cb">Rerank</label>
+        </legend>
+        <div class="rr_detail" >
 
-    Tryout local geo data:
-    &nbsp;
+            Tryout local geo data:
+            &nbsp;
 
-    lat=<input name="geo_lat" type="text" value="{geo_lat}" />
-    long=<input name="geo_long" type="text" value="{geo_long}" />
+            lat=<input name="geo_lat" type="text" value="{geo_lat}" />
+            long=<input name="geo_long" type="text" value="{geo_long}" />
+
+            
+        </div>
+    </fieldset>
 </form>
