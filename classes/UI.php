@@ -12,13 +12,9 @@
  */
 class UI {
 
-    
-    private $searchInput = '';
-    private $searchInputType;
-    private $searchCommited;
-    private $searchOutput;
     private $page;
-    private $message;
+    private $search;
+    private $rerank;
 
     //to be defined somewhere else or loaded from ..?
     const PAGE_TPL_LOCATION = "./tpl/page.tpl.xhtml";
@@ -26,21 +22,11 @@ class UI {
     const INPUT_TPL_LOCATION = "./tpl/inputBlock.tpl.xhtml";
     private $inputTpl;
 
-    public function __construct() {
-        $this->resetUI();
+    public function __construct(Search $s, Rerank $rr) {
+        $this->search = $s;
+        $this->rerank = $rr;
+
         $this->loadTemplates();
-    }
-
-    public function fillUI($input, $type, $commited, $output, $message) {
-        $this->setSearchInput($input);
-        $this->setSearchInputType($type);
-        $this->setSearchCommited($commited);
-        $this->setSearchOutput($output);
-        $this->setMessage($message);
-    }
-
-    public function resetUI() {
-        $this->fillUI('', "text", false, "", "");
     }
 
     public function loadTemplates() {
@@ -48,73 +34,66 @@ class UI {
         $this->inputTpl = file_get_contents(self::INPUT_TPL_LOCATION);
     }
 
-//--
-//    public function buildUIold($input, $type, $commited, $output, $message) {
-//        $this->fillUI($input, $type, $commited, $output, $message);
-//
-//        //get the page
-//       $inputBlock = $this->inputTpl;
-//        $inputBlock = str_replace("{inputText}", htmlspecialchars($input), $inputBlock);
-//        $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($type), $inputBlock);
-//
-//        $page = $this->pageTpl;
-//        $page = str_replace("{inputBlock}", $inputBlock, $page);
-//        $page = str_replace("{outputBlock}", $output, $page);
-//        $page = str_replace("{message}", $message,  $page);
-//
-//        $this->page = $page;
-//    }
-
-    public function buildUI(Search $ms) {
+    public function buildUI() {
         $inputBlock = $this->inputTpl;
         $inputBlock = str_replace("{inputText}", htmlspecialchars($_REQUEST["input"]), $inputBlock);
         $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($_REQUEST["searchType"]), $inputBlock);
 
-        $inputBlock = str_replace("{geo_lat}", $ms->getLocal_geo()->getLatitude(), $inputBlock);
-        $inputBlock = str_replace("{geo_long}", $ms->getLocal_geo()->getLongitude(), $inputBlock);
+        $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked" : ""), $inputBlock);
+
+        if (isset($_REQUEST["rerank"])) {
+            $geo_lat = $_REQUEST["geo_lat"];
+            $geo_long = $_REQUEST["geo_long"];
+        } else {
+            $geo_lat = "";
+            $geo_long = "";
+        }
+        $inputBlock = str_replace("{geo_lat}", $geo_lat, $inputBlock);
+        $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
 
 
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
-        $page = str_replace("{message}", $ms->getMessage(), $page);
+        $page = str_replace("{message}", $this->search->getMessage(), $page);
 
-        if ($ms->isCommitted()) {
+
+        if ($this->search->isCommitted()) {
             //generate output
-            $output_imgs = $this->createAImgsTable($ms->getResultPhotos(), $ms);
+            $output_imgs = $this->createAImgsTable($this->search->getResultPhotos());
             $heading = "<h1>Here it is:</h1>\n";
             $output = $heading . $output_imgs;
 
-            $page = str_replace("{outputBlock}", $output, $page);
         } else {
-            $initMsg = "<p>Start the search!</p>";
-            $page = str_replace("{outputBlock}", $initMsg, $page);
+            $output = "<p>Start the search!</p>";
+            
         }
         $page = str_replace("{outputBlock}", $output, $page);
 
         $this->page = $page;
     }
 
-    public function createAImg(Photo $p, Search $ms) {
+    public function createAImg(Photo $p) {
         $out = "";
 
-        $img = "<img src=\"" . $p->getThumbnailUrl() . "\" />";
+        $img = "<img src=\"" . $p->getThumbnailUrl() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getFullsizeUrl() . "\" >" . $img . "</a><br/>\n";
 
 
-        
+
         $lat = $p->getGeo()->getLatitude();
         $long = $p->getGeo()->getLongitude();
 
-        if ($p->getGeo()->isValid() && $ms->getLocal_geo()->isValid()) { //both local & picture geo valid
-            $out .= "geo={lat=$lat;long=$long}<br />";
-            $out .= "Distance = " . $p->getGeo()->calcDistanceFrom($ms->getLocal_geo()) . "km";
-        }
 
+        if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
+            $out .= "geo={lat=$lat;long=$long}<br />";
+            $out .= "Distance = " . $p->getRrDistance() . "km";
+        }
+        /*         */
         return $out;
     }
 
-    public function createAImgsTable($array, Search $ms) {
+    public function createAImgsTable($array) {
         $out = "";
         $table_w = 3;
 
@@ -127,12 +106,13 @@ class UI {
         for ($index = 0; $index < count($array); $index++) {
             $one = $array[$index];
 
-            if ($index % $table_w == 0 && $index != 0 && $index + 1 != count($array)) { //nasobek, neni 0. ani posledni
+            if ($index % $table_w == 0 && $index != 0 && ($index) != count($array)) { //nasobek, neni 0. ani posledni
                 $out .= "</tr>\n<tr>";
             }
 
             $out .= "<td>";
-            $out .= $this->createAImg($one, $ms) . "\n";
+
+            $out .= $this->createAImg($one) . "\n";
             $out .= "</td>\n";
         }
         $out .= "</tr>\n</table>\n";
@@ -157,38 +137,6 @@ class UI {
 
     //------------setters, getters
 
-    public function getSearchInput() {
-        return $this->searchInput;
-    }
-
-    public function setSearchInput($searchInput) {
-        $this->searchInput = $searchInput;
-    }
-
-    public function getSearchInputType() {
-        return $this->searchInputType;
-    }
-
-    public function setSearchInputType($searchInputType) {
-        $this->searchInputType = $searchInputType;
-    }
-
-    public function isSearchCommited() {
-        return $this->searchCommited;
-    }
-
-    public function setSearchCommited($searchCommited) {
-        $this->searchCommited = $searchCommited;
-    }
-
-    public function getSearchOutput() {
-        return $this->searchOutput;
-    }
-
-    public function setSearchOutput($searchOutput) {
-        $this->searchOutput = $searchOutput;
-    }
-
     public function getPage() {
         return $this->page;
     }
@@ -197,12 +145,20 @@ class UI {
         $this->page = $page;
     }
 
-    public function setMessage($message) {
-        $this->message = $message;
+    public function getSearch() {
+        return $this->search;
     }
 
-    public function resetMessage() {
-        $this->message = '';
+    public function setSearch($search) {
+        $this->search = $search;
+    }
+
+    public function getRerank() {
+        return $this->rerank;
+    }
+
+    public function setRerank($rerank) {
+        $this->rerank = $rerank;
     }
 
 }

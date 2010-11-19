@@ -30,7 +30,6 @@ class Search {
     private $resultPhotos = array(); //array of photos
     private $message;
     private $committed;
-    private $local_geo;
 
     public function __construct(phpFlickr $f) {
         //set default
@@ -38,9 +37,8 @@ class Search {
         $this->f = $f;
         $this->message = '';
         $this->committed = false;
-        $this->local_geo = new Geo("", "", true); //invalid Geo for starters :)
 
-      //  $this->local_geo = new Geo(0, 0); //invalid
+      
     }
 
     public static function fixType($type) {
@@ -59,19 +57,7 @@ class Search {
         $this->type = self::fixType($type);
     }
 
-    public function requestGeo() {
-        $lat_req = $_REQUEST["geo_lat"];
-        $long_req = $_REQUEST["geo_long"];
-
-        //e.g.  2 00, 34 -> 200.34
-        $lat_req = Helper::czFixFloat($lat_req);
-        $long_req = Helper::czFixFloat($long_req);
-
-
-       // print $lat_req . "---";
-        //print $_REQUEST["geo_lat"] . "XX";
-        $this->local_geo = new Geo($lat_req, $long_req);
-    }
+    
 
     public function searchByDate($from = '', $to ='', $count = self::DEFAULT_COUNT) {
         $args = array();
@@ -124,8 +110,7 @@ class Search {
         $this->resetMessage();
         $this->setType($_REQUEST["searchType"]); //being fixed inside!
         $this->setCommitted(true);
-        $this->requestGeo(); //being fixed inside and marked (in)valid
-
+        
        
         switch ($this->getType()) {
             default :
@@ -194,6 +179,10 @@ class Search {
         return $this->resultPhotos;
     }
 
+    public function setResultPhotos( $result ) {
+        $this->resultPhotos = $result;
+    }
+
     public function getType() {
         return $this->type;
     }
@@ -218,17 +207,7 @@ class Search {
         $this->committed = $committed;
     }
 
-    /**
-     * return center of the search/rerank
-     * @return Geo  position
-     */
-    public function getLocal_geo() {
-        return $this->local_geo;
-    }
-
-    public function setLocal_geo($local_geo) {
-        $this->local_geo = $local_geo;
-    }
+   
 
 }
 
