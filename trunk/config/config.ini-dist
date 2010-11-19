@@ -1,0 +1,13 @@
+;this file contains our app settings
+
+;api setting
+api_key = 
+api_secret = 
+
+;db caching settings
+; to be used as $f->enableCache("db", "mysql://flickr:flickr@localhost/flickr");
+db_type = 
+db_username = 
+db_password = 
+db_host = 
+db_database_name = 
