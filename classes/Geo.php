@@ -11,6 +11,7 @@
  * @author Daniel
  */
 class Geo {
+    
 
     private $valid = false;
     private $latitude;

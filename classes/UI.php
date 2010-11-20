@@ -11,6 +11,7 @@
  * @author Daniel
  */
 class UI {
+    const GEO_UI_PRECISION = 4;
 
     private $page;
     private $search;
@@ -51,11 +52,11 @@ class UI {
 
             foreach (Rerank::$types as $value) {
                 $out = "";
-                if ($this->rerank->getType() == $value) $out = "checked=\"checked\"";
+                if ($this->rerank->getType() == $value)
+                    $out = "checked=\"checked\"";
                 //e.g. {geo_rrTypeChecked}
-                 $inputBlock = str_replace("{{$value}_rrTypeChecked}", $out, $inputBlock);
+                $inputBlock = str_replace("{{$value}_rrTypeChecked}", $out, $inputBlock);
             }
-
         } else {
             $geo_lat = "";
             $geo_long = "";
@@ -63,7 +64,7 @@ class UI {
         }
         $inputBlock = str_replace("{geo_lat}", $geo_lat, $inputBlock);
         $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
-        
+
         $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
 
         $page = $this->pageTpl;
@@ -91,19 +92,32 @@ class UI {
         $img = "<img src=\"" . $p->getThumbnailUrl() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getFullsizeUrl() . "\" >" . $img . "</a><br/>\n";
 
+        $out .= "Views: <span class=\"help\" title=\"Because we cache...\">&#177</span>" . $p->getViews() . "<br/>\n";
 
-        if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
-            $lat = $p->getGeo()->getLatitude();
-            $long = $p->getGeo()->getLongitude();
+        /*
+          if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
+          $lat = $p->getGeo()->getLatitude();
+          $long = $p->getGeo()->getLongitude();
 
+          $out .= "geo={lat=$lat;long=$long}<br />";
+          $out .= "Distance = " . $p->getRrDistance() . "km";
+          }
+         */
+
+        if ($p->getGeo()->isValid()) {
+            $lat = round($p->getGeo()->getLatitude(), UI::GEO_UI_PRECISION);
+            $long = round($p->getGeo()->getLongitude(), UI::GEO_UI_PRECISION);
             $out .= "geo={lat=$lat;long=$long}<br />";
-            $out .= "Distance = " . $p->getRrDistance() . "km";
+
+            if ($this->rerank->getLocal_geo()->isValid()) {
+                $out .= "Distance = " . round($p->getRrDistance(),UI::GEO_UI_PRECISION) . "km";
+            }
         }
 
-        if( $this->rerank->getType() == "title_similarity") {
-            $out .= "title_similarity = " . $p->getTitleSimilarity()  . "<br/>\n";
+        if ($this->rerank->getType() == "title_similarity") {
+            $out .= "title_similarity = " . $p->getTitleSimilarity() . "<br/>\n";
         }
-        
+
         return $out;
     }
 
