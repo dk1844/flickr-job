@@ -8,32 +8,45 @@
         </legend>
         <div class="rr_detail" >
 
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <input type="radio" name="rerankType" value="title" id="rerank_t"  {title_rrTypeChecked} />
+                        <label for="rerank_t">by <span class="rrTypeRadio">title</span></label>
+                    </td>
+                </tr>
 
-            <input type="radio" name="rerankType" value="title" id="rerank_t"  {title_rrTypeChecked} />
-            <label for="rerank_t">by <span class="rrTypeRadio">title</span></label>
-            <br/>
+                <tr>
+                    <td>
+                        <input type="radio" name="rerankType" value="title_similarity" id="rerank_ts"  {title_similarity_rrTypeChecked} />
+                        <label for="rerank_ts">by <span class="rrTypeRadio">title similarity</span></label>
+                    </td>
+                    <td>
+                        Pattern:
+                        <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
+                    </td>
+                </tr>
 
-            <input type="radio" name="rerankType" value="title_similarity" id="rerank_ts"  {title_similarity_rrTypeChecked} />
-            <label for="rerank_ts">by <span class="rrTypeRadio">title similarity</span></label>
-            Pattern:
-            <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
-            <br/>
+                <tr>
+                    <td coslspan="2">
+                        <input type="radio" name="rerankType" value="views" id="rerank_w"  {views_rrTypeChecked} />
+                        <label for="rerank_w">by <span class="rrTypeRadio">views</span></label>
+                    </td>
+                </tr>
 
-            <input type="radio" name="rerankType" value="views" id="rerank_w"  {views_rrTypeChecked} />
-            <label for="rerank_w">by <span class="rrTypeRadio">views</span></label>
-            <br/>
+                <tr>
+                    <td>
+                        <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
+                        <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label>
+                    </td>    
+                    <td>
+                        Geo data:  &nbsp;
+                        lat=<input name="geo_lat" type="text" value="{geo_lat}" />
+                        long=<input name="geo_long" type="text" value="{geo_long}" />
+                    </td>
+                </tr>
 
-
-            <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
-            <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label> 
-            Geo data:  &nbsp;
-            lat=<input name="geo_lat" type="text" value="{geo_lat}" />
-            long=<input name="geo_long" type="text" value="{geo_long}" />
-            <br/>
-
-            
-            
-            
+            </table>
 
         </div>
     </fieldset>
