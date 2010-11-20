@@ -18,6 +18,7 @@ class Rerank {
     public static $types = array(
         "title",
         "title_similarity",
+        "views",
         "geo",
     );
     private $type;
@@ -47,16 +48,20 @@ class Rerank {
 
         switch ($this->getType()) {
             default:
-            case "text":
+            case "title":
                 $this->rerankByTitle();
-                break;
-
-            case "geo":
-                $this->rerankByDistance();
                 break;
 
             case "title_similarity":
                 $this->rerankByTitleSimilarity();
+                break;
+            
+            case "views":
+                $this->rerankByViews();
+                break;
+
+            case "geo":
+                $this->rerankByDistance();
                 break;
         }
     }
@@ -158,7 +163,6 @@ class Rerank {
         $this->search->setResultPhotos($arr);
     }
 
-
     //---------------rerank:title similarity---------------------
     public function rerankByTitleSimilarity() {
         $sp_req = trim($_REQUEST["title_similarity_pattern"]);
@@ -186,21 +190,40 @@ class Rerank {
         }
     }
 
-        public static function cmpByTitleSimilarity(Photo $photo1, Photo $photo2) {
-            if ($photo1->getTitleSimilarity() == $photo2->getTitleSimilarity())
-                    return 0; //same
+    public static function cmpByTitleSimilarity(Photo $photo1, Photo $photo2) {
+        if ($photo1->getTitleSimilarity() == $photo2->getTitleSimilarity())
+            return 0; //same
 
             if ($photo1->getTitleSimilarity() > $photo2->getTitleSimilarity())
-                    return 1; // >
+            return 1; // >
 
             return -1; // <
-        }
+    }
+
+    public static function cmpByTitleSimilarityReversed(Photo $photo1, Photo $photo2) {
+        $res = self::cmpByTitleSimilarity($photo1, $photo2);
+
+        return (-1) * $res;  // -1 => 1; 1=> -1, 0 zustava;
+    }
+
+     //---------------rerank:views---------------------
+    public static function cmpByViews(Photo $photo1, Photo $photo2) {
+        $s1 = $photo1->getViews();
+        $s2 = $photo2->getViews();
         
-         public static function cmpByTitleSimilarityReversed(Photo $photo1, Photo $photo2) {
-             $res = self::cmpByTitleSimilarity($photo1, $photo2);
-             
-             return (-1)*$res;  // -1 => 1; 1=> -1, 0 zustava;
-         }
+        if ($s1 < $s2) return 1;
+        if ($s1 > $s2) return -1;
+        return 0; // =
+    }
+
+    public function rerankByViews() {
+
+        $arr = $this->search->getResultPhotos();
+
+        usort($arr, array("Rerank", "cmpByViews"));
+        $this->search->setResultPhotos($arr);
+    }
+
 
     /**
      * return center of the search/rerank
