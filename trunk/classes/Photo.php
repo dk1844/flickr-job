@@ -23,7 +23,9 @@ class Photo {
     private $geo;
     private $thumbnail_url;
     private $fullsize_url;
+    // rr vars
     private $rrDistance;
+    private $titleSimilarity;
 
 
     /*
@@ -95,6 +97,23 @@ class Photo {
         $fullUrl = $sizes_response[$largest_index]["source"];
 
         return $fullUrl;
+    }
+
+    public static function calcTitleSimilarity($title1, $title2) {
+        if (empty($title1) || empty($title2))
+            return 0;
+        return similar_text(mb_strtolower($title1), mb_strtolower($title2)); //to lowercase 
+    }
+
+    public function calcTitleSimilarityTo($otherTitle) {
+        $this_title = $this->getTitle();
+        if (empty($this_title))
+            return 0;
+        return Photo::calcTitleSimilarity($this->getTitle(), $otherTitle);
+    }
+
+    public function assignTitleSimilarityTo($otherTitle) {
+        $this->setTitleSimilarity($this->calcTitleSimilarityTo($otherTitle));
     }
 
 ///-------getters and setters-------------
@@ -193,6 +212,14 @@ class Photo {
 
     public function setRrDistance($rrDistance) {
         $this->rrDistance = $rrDistance;
+    }
+
+    public function getTitleSimilarity() {
+        return $this->titleSimilarity;
+    }
+
+    public function setTitleSimilarity($titleSimilarity) {
+        $this->titleSimilarity = $titleSimilarity;
     }
 
 }

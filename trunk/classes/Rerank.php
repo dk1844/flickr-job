@@ -17,9 +17,11 @@ class Rerank {
     private $committed;
     public static $types = array(
         "title",
+        "title_similarity",
         "geo",
-    ); 
+    );
     private $type;
+    private static $titleSimilarityPattern;
 
     public function __construct(Search $s) {
         $this->search = $s;
@@ -27,7 +29,7 @@ class Rerank {
         $this->type = self::$types[0];
     }
 
-     public static function fixType($type) {
+    public static function fixType($type) {
         $out = "";
         if (in_array($type, self::$types)) {
             //set chosen type
@@ -45,7 +47,7 @@ class Rerank {
 
         switch ($this->getType()) {
             default:
-            case "text": 
+            case "text":
                 $this->rerankByTitle();
                 break;
 
@@ -53,12 +55,12 @@ class Rerank {
                 $this->rerankByDistance();
                 break;
 
+            case "title_similarity":
+                $this->rerankByTitleSimilarity();
+                break;
         }
-
-        
     }
 
-    
     //---------------rerank:geo/distance---------------------
     public function rerankByDistance() {
         $this->requestGeo(); //being fixed inside and marked (in)valid
@@ -138,8 +140,6 @@ class Rerank {
         return -1; // <
     }
 
-
-
     //---------------rerank:title---------------------
     public static function cmpByTitle(Photo $photo1, Photo $photo2) {
         //strtolower doesnt seem to work on nation-specific stuff
@@ -157,6 +157,50 @@ class Rerank {
         usort($arr, array("Rerank", "cmpByTitle"));
         $this->search->setResultPhotos($arr);
     }
+
+
+    //---------------rerank:title similarity---------------------
+    public function rerankByTitleSimilarity() {
+        $sp_req = trim($_REQUEST["title_similarity_pattern"]);
+        if (empty($sp_req)) {
+
+            $this->search->setMessage("Cannot rerank by title similarity with no pattern.");
+            $this->setCommitted(false);
+            return;
+        }
+        $this->setTitleSimilarityPattern($sp_req);
+
+        $this->assignSimilarityToPhotos();
+
+        $arr = $this->search->getResultPhotos();
+
+        //this means: for comparing Array of Objects use callback compare function Rerank::cmpByDistance (musi byt static)
+        usort($arr, array("Rerank", "cmpByTitleSimilarityReversed"));
+        $this->search->setResultPhotos($arr);
+    }
+
+    public function assignSimilarityToPhotos() {
+        foreach ($this->search->getResultPhotos() as $p) {
+            /* @var $p Photo */
+            $p->assignTitleSimilarityTo($this->getTitleSimilarityPattern());
+        }
+    }
+
+        public static function cmpByTitleSimilarity(Photo $photo1, Photo $photo2) {
+            if ($photo1->getTitleSimilarity() == $photo2->getTitleSimilarity())
+                    return 0; //same
+
+            if ($photo1->getTitleSimilarity() > $photo2->getTitleSimilarity())
+                    return 1; // >
+
+            return -1; // <
+        }
+        
+         public static function cmpByTitleSimilarityReversed(Photo $photo1, Photo $photo2) {
+             $res = self::cmpByTitleSimilarity($photo1, $photo2);
+             
+             return (-1)*$res;  // -1 => 1; 1=> -1, 0 zustava;
+         }
 
     /**
      * return center of the search/rerank
@@ -178,15 +222,21 @@ class Rerank {
         $this->committed = $committed;
     }
 
-        public function getType() {
+    public function getType() {
         return $this->type;
     }
 
-        public function setType($type) {
+    public function setType($type) {
         $this->type = self::fixType($type);
     }
 
+    public function getTitleSimilarityPattern() {
+        return self::$titleSimilarityPattern;
+    }
 
+    public function setTitleSimilarityPattern($titleSimilarityPattern) {
+        self::$titleSimilarityPattern = $titleSimilarityPattern;
+    }
 
 }
 
