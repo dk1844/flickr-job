@@ -8,13 +8,21 @@
         </legend>
         <div class="rr_detail" >
 
-            Tryout local geo data:
-            &nbsp;
 
-            lat=<input name="geo_lat" type="text" value="{geo_lat}" />
+            <input type="radio" name="rerankType" value="title" id="rerank_t"  {title_rrTypeChecked} />
+            <label for="rerank_t">by <span class="rrTypeRadio">title</span></label>
+            <br/>
+
+
+            <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
+            <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label> Geo data:  &nbsp;   lat=<input name="geo_lat" type="text" value="{geo_lat}" />
             long=<input name="geo_long" type="text" value="{geo_long}" />
+            <br/>
 
             
+            
+            
+
         </div>
     </fieldset>
 </form>

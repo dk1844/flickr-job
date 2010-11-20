@@ -15,10 +15,66 @@ class Rerank {
     private $search;
     private $local_geo;
     private $committed;
+    public static $types = array(
+        "title",
+        "geo",
+    ); 
+    private $type;
 
     public function __construct(Search $s) {
         $this->search = $s;
         $this->local_geo = new Geo("", "", true); //invalid Geo for starters :)
+        $this->type = self::$types[0];
+    }
+
+     public static function fixType($type) {
+        $out = "";
+        if (in_array($type, self::$types)) {
+            //set chosen type
+            $out = $type;
+        } else {
+            //set default type otherwise
+            $out = self::$types[0];
+        }
+        return $out;
+    }
+
+    public function genericRerank() {
+        $this->setType($_REQUEST["rerankType"]);
+        $this->setCommitted(true); //by default: it'll be ok
+
+        switch ($this->getType()) {
+            default:
+            case "text": 
+                $this->rerankByTitle();
+                break;
+
+            case "geo":
+                $this->rerankByDistance();
+                break;
+
+        }
+
+        
+    }
+
+    
+    //---------------rerank:geo/distance---------------------
+    public function rerankByDistance() {
+        $this->requestGeo(); //being fixed inside and marked (in)valid
+        if (!$this->local_geo->isValid()) {
+            $this->search->setMessage("Cannot rerank by geo when local geo data are invalid.");
+            $this->setCommitted(false);
+            return;
+        }
+
+        $this->assignDistanceToPhotos();
+
+        $arr = $this->search->getResultPhotos();
+
+        //this means: for comparing Array of Objects use callback compare function Rerank::cmpByDistance (musi byt static)
+        usort($arr, array("Rerank", "cmpByDistance"));
+        $this->search->setResultPhotos($arr);
     }
 
     public function requestGeo() {
@@ -33,12 +89,6 @@ class Rerank {
         // print $lat_req . "---";
         //print $_REQUEST["geo_lat"] . "XX";
         $this->local_geo = new Geo($lat_req, $long_req); //may not be valid
-    }
-
-    public function genericRerank() {
-        //tryout
-        $this->setCommitted(true);
-        $this->rrByDistance();
     }
 
     public function assignDistanceToPhoto(Photo $p) {
@@ -84,24 +134,27 @@ class Rerank {
         if ($photo1->getRrDistance() > $photo2->getRrDistance()) {
             return 1;
         }
-        
-        return -1; // <
 
+        return -1; // <
     }
 
-    public function rrByDistance($order = "asc") {
-        $this->requestGeo(); //being fixed inside and marked (in)valid
-        if (!$this->local_geo->isValid()) {
-            $this->search->setMessage("Cannot rerank by geo when local geo data are invalid.");
-            $this->setCommitted(false);
-            return;
-        }
 
-        $this->assignDistanceToPhotos();
+
+    //---------------rerank:title---------------------
+    public static function cmpByTitle(Photo $photo1, Photo $photo2) {
+        //strtolower doesnt seem to work on nation-specific stuff
+        // mb_strtolower()  is better
+        $s1 = mb_strtolower($photo1->getTitle());
+        $s2 = mb_strtolower($photo2->getTitle());
+        return strcmp($s1, $s2);
+    }
+
+    public function rerankByTitle() {
 
         $arr = $this->search->getResultPhotos();
 
-        usort($arr, array("Rerank", "cmpByDistance"));
+        //this means: for comparing Array of Objects use callback compare function Rerank::cmpByDistance (musi byt static)
+        usort($arr, array("Rerank", "cmpByTitle"));
         $this->search->setResultPhotos($arr);
     }
 
@@ -117,13 +170,22 @@ class Rerank {
         $this->local_geo = $local_geo;
     }
 
-        public function isCommitted() {
+    public function isCommitted() {
         return $this->committed;
     }
 
     public function setCommitted($committed) {
         $this->committed = $committed;
     }
+
+        public function getType() {
+        return $this->type;
+    }
+
+        public function setType($type) {
+        $this->type = self::fixType($type);
+    }
+
 
 
 }

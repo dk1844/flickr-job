@@ -41,9 +41,19 @@ class UI {
 
         $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked" : ""), $inputBlock);
 
+
+
         if (isset($_REQUEST["rerank"])) {
             $geo_lat = $_REQUEST["geo_lat"];
             $geo_long = $_REQUEST["geo_long"];
+
+            foreach (Rerank::$types as $value) {
+                $out = "";
+                if ($this->rerank->getType() == $value) $out = "checked=\"checked\"";
+                //e.g. {geo_rrTypeChecked}
+                 $inputBlock = str_replace("{{$value}_rrTypeChecked}", $out, $inputBlock);
+            }
+
         } else {
             $geo_lat = "";
             $geo_long = "";
@@ -63,10 +73,8 @@ class UI {
             $output_imgs = $this->createAImgsTable($this->search->getResultPhotos());
             $heading = "<h1>Here it is:</h1>\n";
             $output = $heading . $output_imgs;
-
         } else {
             $output = "<p>Start the search!</p>";
-            
         }
         $page = str_replace("{outputBlock}", $output, $page);
 
@@ -75,17 +83,16 @@ class UI {
 
     public function createAImg(Photo $p) {
         $out = "";
+        $out = "<h4>" . $p->getTitle() . "</h4>";
 
         $img = "<img src=\"" . $p->getThumbnailUrl() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getFullsizeUrl() . "\" >" . $img . "</a><br/>\n";
 
 
-
-        $lat = $p->getGeo()->getLatitude();
-        $long = $p->getGeo()->getLongitude();
-
-
         if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
+            $lat = $p->getGeo()->getLatitude();
+            $long = $p->getGeo()->getLongitude();
+
             $out .= "geo={lat=$lat;long=$long}<br />";
             $out .= "Distance = " . $p->getRrDistance() . "km";
         }
