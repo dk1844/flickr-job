@@ -1,0 +1,19 @@
+/* 
+    Document   : screen
+    Created on : 20.11.2010, 16:03:39
+    Author     : Daniel
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.rrTypeRadio {
+    font-weight: bold;
+    color: firebrick;
+
+}
+
