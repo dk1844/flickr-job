@@ -17,3 +17,18 @@
 
 }
 
+.help {
+    border-bottom: 1px dotted firebrick;
+    cursor: help;
+}
+
+.geo_data {
+    font-size: small;
+    background-image: url("../pix/globe16.png");
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: left center;
+    background-color: transparent;
+    padding-left: 18px;
+}
+
