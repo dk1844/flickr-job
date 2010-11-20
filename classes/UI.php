@@ -92,7 +92,7 @@ class UI {
         $img = "<img src=\"" . $p->getThumbnailUrl() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getFullsizeUrl() . "\" >" . $img . "</a><br/>\n";
 
-        $out .= "Views: <span class=\"help\" title=\"Because we cache...\">&#177</span>" . $p->getViews() . "<br/>\n";
+        $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
 
         /*
           if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
@@ -107,7 +107,7 @@ class UI {
         if ($p->getGeo()->isValid()) {
             $lat = round($p->getGeo()->getLatitude(), UI::GEO_UI_PRECISION);
             $long = round($p->getGeo()->getLongitude(), UI::GEO_UI_PRECISION);
-            $out .= "geo={lat=$lat;long=$long}<br />";
+            $out .= "<span class=\"geo_data\" title=\"Geographic data (&lt;latitude&gt;;&lt;logitude&gt;)\">($lat;$long)</span><br />";
 
             if ($this->rerank->getLocal_geo()->isValid()) {
                 $out .= "Distance = " . round($p->getRrDistance(),UI::GEO_UI_PRECISION) . "km";
