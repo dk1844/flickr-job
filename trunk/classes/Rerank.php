@@ -57,7 +57,8 @@ class Rerank {
     }
 
     /**
-     * Compares 2 photos by their distance, distance may not be valid at any photo. Undefined dist is bigger than defined.
+     * Compares 2 photos by their distance, distance may not be valid at any photo. Undefined distance is always bigger than defined.
+     * This is an callback function, for more info see @link http://cz.php.net/usort example #3. 
      * @param Photo $photo1
      * @param Photo $photo2
      * @return 1 if >, -1 if <, 0 if =.
