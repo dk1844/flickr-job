@@ -44,8 +44,10 @@ class UI {
 
 
         if (isset($_REQUEST["rerank"])) {
-            $geo_lat = $_REQUEST["geo_lat"];
-            $geo_long = $_REQUEST["geo_long"];
+            $geo_lat = htmlspecialchars($_REQUEST["geo_lat"]);
+            $geo_long = htmlspecialchars($_REQUEST["geo_long"]);
+
+            $title_similarity_pattern = htmlspecialchars($_REQUEST["title_similarity_pattern"]);
 
             foreach (Rerank::$types as $value) {
                 $out = "";
@@ -57,11 +59,12 @@ class UI {
         } else {
             $geo_lat = "";
             $geo_long = "";
+            $$title_similarity_pattern = "";
         }
         $inputBlock = str_replace("{geo_lat}", $geo_lat, $inputBlock);
         $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
-
-
+        
+        $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
@@ -96,7 +99,11 @@ class UI {
             $out .= "geo={lat=$lat;long=$long}<br />";
             $out .= "Distance = " . $p->getRrDistance() . "km";
         }
-        /*         */
+
+        if( $this->rerank->getType() == "title_similarity") {
+            $out .= "title_similarity = " . $p->getTitleSimilarity()  . "<br/>\n";
+        }
+        
         return $out;
     }
 

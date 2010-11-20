@@ -13,9 +13,17 @@
             <label for="rerank_t">by <span class="rrTypeRadio">title</span></label>
             <br/>
 
+            <input type="radio" name="rerankType" value="title_similarity" id="rerank_ts"  {title_similarity_rrTypeChecked} />
+            <label for="rerank_ts">by <span class="rrTypeRadio">title similarity</span></label>
+            Pattern:
+            <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
+            <br/>
+
 
             <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
-            <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label> Geo data:  &nbsp;   lat=<input name="geo_lat" type="text" value="{geo_lat}" />
+            <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label> 
+            Geo data:  &nbsp;
+            lat=<input name="geo_lat" type="text" value="{geo_lat}" />
             long=<input name="geo_long" type="text" value="{geo_long}" />
             <br/>
 
