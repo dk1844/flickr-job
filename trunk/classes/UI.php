@@ -49,6 +49,7 @@ class UI {
             $geo_long = htmlspecialchars($_REQUEST["geo_long"]);
 
             $title_similarity_pattern = htmlspecialchars($_REQUEST["title_similarity_pattern"]);
+            $views_point = htmlspecialchars($_REQUEST["views_point"]);
             
 
             foreach (Rerank::$types as $value) {
@@ -62,11 +63,13 @@ class UI {
             $geo_lat = "";
             $geo_long = "";
             $$title_similarity_pattern = "";
+            $views_point="";
         }
         $inputBlock = str_replace("{geo_lat}", $geo_lat, $inputBlock);
         $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
 
         $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
+        $inputBlock = str_replace("{views_point}", $views_point, $inputBlock);
         $inputBlock = str_replace("{similarityTypeSelector}", $this->createSimilarityTypeSelector($this->rerank->getSimilarityType()), $inputBlock);
 
         $page = $this->pageTpl;
@@ -96,16 +99,10 @@ class UI {
 
         $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
 
-        /*
-          if ($p->getGeo()->isValid() && $this->rerank->getLocal_geo()->isValid()) { //both local & picture geo valid
-          $lat = $p->getGeo()->getLatitude();
-          $long = $p->getGeo()->getLongitude();
-
-          $out .= "geo={lat=$lat;long=$long}<br />";
-          $out .= "Distance = " . $p->getRrDistance() . "km";
-          }
-         */
-
+       // if($this->rerank->getViews_point() != 0) {
+       //     $out .= "ViewsDiff: " . $p->getViewsDiff() ."<br/>\n";
+       // }
+   
         if ($p->getGeo()->isValid()) {
             $lat = round($p->getGeo()->getLatitude(), UI::GEO_UI_PRECISION);
             $long = round($p->getGeo()->getLongitude(), UI::GEO_UI_PRECISION);

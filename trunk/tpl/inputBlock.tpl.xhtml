@@ -37,6 +37,18 @@
 
                 <tr>
                     <td>
+                        <input type="radio" name="rerankType" value="views_diff" id="rerank_wd"  {views_diff_rrTypeChecked} />
+                        <label for="rerank_wd">by <span class="rrTypeRadio">views difference to:</span></label>
+                    </td>
+                    <td>
+                        Your guess:
+                        <input type="text" name="views_point" value="{views_point}" />
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
                         <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
                         <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label>
                     </td>    

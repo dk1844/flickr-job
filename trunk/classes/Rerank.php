@@ -19,6 +19,7 @@ class Rerank {
         "title",
         "title_similarity",
         "views",
+        "views_diff",
         "geo",
     );
     private $type;
@@ -28,12 +29,14 @@ class Rerank {
     );
     private $similarityType;
     private static $titleSimilarityPattern;
+    private $views_point;
 
     public function __construct(Search $s) {
         $this->search = $s;
         $this->local_geo = new Geo("", "", true); //invalid Geo for starters :)
         $this->type = self::$types[0];
         $this->similarityType = self::$similarityTypes[0]; //levenshtein
+        $this->views_point = 0;
     }
 
     public static function fixType($type) {
@@ -78,6 +81,10 @@ class Rerank {
                 $this->rerankByViews();
                 break;
 
+            case "views_diff":
+                $this->rerankByViewsDiff();
+                break;
+
             case "geo":
                 $this->rerankByDistance();
                 break;
@@ -86,7 +93,7 @@ class Rerank {
 
     //---------------rerank:geo/distance---------------------
     public function rerankByDistance() {
-        $this->requestGeo(); //being fixed inside and marked (in)valid
+        $this->requestGeo(); //being fixed inside and marked (in)valid //TODO: presunout dovnitr assignPhotosTo..
         if (!$this->local_geo->isValid()) {
             $this->search->setMessage("Cannot rerank by geo when local geo data are invalid.");
             $this->setCommitted(false);
@@ -116,18 +123,13 @@ class Rerank {
         $this->local_geo = new Geo($lat_req, $long_req); //may not be valid
     }
 
-    public function assignDistanceToPhoto(Photo $p) {
-        //at this point local_geo is valid
-        if ($p->getGeo()->isValid()) {
-            $distance = Geo::calcDistance($this->getLocal_geo(), $p->getGeo());
-            $p->setRrDistance($distance);
-        }
-    }
-
+ 
     public function assignDistanceToPhotos() {
         $array = $this->search->getResultPhotos();
         foreach ($array as $p) {
-            $this->assignDistanceToPhoto($p);
+            /* @var $p Photo*/
+            $p->assignDistanceTo($this->getLocal_geo());
+            //$this->assignDistanceToPhoto($p);
         }
     }
 
@@ -209,7 +211,7 @@ class Rerank {
     public function assignSimilarityToPhotos() {
         foreach ($this->search->getResultPhotos() as $p) {
             /* @var $p Photo */
-            $p->assignTitleSimilarityTo($this->getTitleSimilarityPattern(), $this->getSimilarityType() );
+            $p->assignTitleSimilarityTo($this->getTitleSimilarityPattern(), $this->getSimilarityType());
         }
     }
 
@@ -255,6 +257,56 @@ class Rerank {
         $this->search->setResultPhotos($arr);
     }
 
+    //---------------rerank:views_diff---------------------
+
+    public function assignViewsDiffToPhotos() {
+        foreach ($this->search->getResultPhotos() as $p) {
+            /* @var $p Photo */
+            $p->assignViewsDiffTo($this->getViews_point());
+        }
+    }
+
+    public function rerankByViewsDiff() {
+        $vd_req = $_REQUEST["views_point"];
+        if (empty($vd_req) || !ctype_digit($vd_req)) {
+
+            $this->search->setMessage("Cannot rerank by view # closeness with no value");
+            $this->setCommitted(false);
+            return;
+        }
+
+        $this->setViews_point($_REQUEST["views_point"]);
+
+        $this->assignViewsDiffToPhotos();
+
+        $arr = $this->search->getResultPhotos(); //type is used inside
+
+
+        usort($arr, array("Rerank", "cmpByViewsDiffReversed"));
+
+        $this->search->setResultPhotos($arr);
+    }
+
+
+
+    public static function cmpByViewsDiff(Photo $photo1, Photo $photo2) {
+
+        $s1 = $photo1->getViewsDiff();
+        $s2 = $photo2->getViewsDiff();
+
+        if ($s1 < $s2)
+            return 1;
+        if ($s1 > $s2)
+            return -1;
+        return 0; // =
+    }
+
+
+     public static function cmpByViewsDiffReversed(Photo $photo1, Photo $photo2) {
+         return self::cmpByViewsDiff($photo1, $photo2)*(-1);
+     }
+
+
     /**
      * return center of the search/rerank
      * @return Geo  position
@@ -297,6 +349,14 @@ class Rerank {
 
     public function setTitleSimilarityPattern($titleSimilarityPattern) {
         self::$titleSimilarityPattern = $titleSimilarityPattern;
+    }
+
+    public function getViews_point() {
+        return $this->views_point;
+    }
+
+    public function setViews_point($views_point) {
+        $this->views_point = $views_point;
     }
 
 }
