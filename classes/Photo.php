@@ -99,21 +99,24 @@ class Photo {
         return $fullUrl;
     }
 
-    public static function calcTitleSimilarity($title1, $title2) {
+    public static function calcTitleSimilarity($title1, $title2, $type = "levenshtein") {
         if (empty($title1) || empty($title2))
             return 0;
-        return similar_text(mb_strtolower($title1), mb_strtolower($title2)); //to lowercase 
-    }
 
-    public function calcTitleSimilarityTo($otherTitle) {
+        if($type == "similar_text")
+            return similar_text(mb_strtolower($title1), mb_strtolower($title2)); //to lowercase;
+
+        return levenshtein(mb_strtolower($title1), mb_strtolower($title2));   //should be faster, has been adviced in a consult :)
+
+    }
+    public function calcTitleSimilarityTo($otherTitle, $type = "levenshtein") {
         $this_title = $this->getTitle();
-        if (empty($this_title))
-            return 0;
-        return Photo::calcTitleSimilarity($this->getTitle(), $otherTitle);
+        
+        return Photo::calcTitleSimilarity($this->getTitle(), $otherTitle, $type);
     }
 
-    public function assignTitleSimilarityTo($otherTitle) {
-        $this->setTitleSimilarity($this->calcTitleSimilarityTo($otherTitle));
+    public function assignTitleSimilarityTo($otherTitle, $type = "levenshtein") {
+        $this->setTitleSimilarity($this->calcTitleSimilarityTo($otherTitle, $type));
     }
 
 ///-------getters and setters-------------

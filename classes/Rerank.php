@@ -22,12 +22,18 @@ class Rerank {
         "geo",
     );
     private $type;
+    public static $similarityTypes = array(
+        "levenshtein",
+        "similar_text",
+    );
+    private $similarityType;
     private static $titleSimilarityPattern;
 
     public function __construct(Search $s) {
         $this->search = $s;
         $this->local_geo = new Geo("", "", true); //invalid Geo for starters :)
         $this->type = self::$types[0];
+        $this->similarityType = self::$similarityTypes[0]; //levenshtein
     }
 
     public static function fixType($type) {
@@ -38,6 +44,18 @@ class Rerank {
         } else {
             //set default type otherwise
             $out = self::$types[0];
+        }
+        return $out;
+    }
+
+    public static function fixSimilarityType($stype) {
+        $out = "";
+        if (in_array($stype, self::$similarityTypes)) {
+            //set chosen type
+            $out = $stype;
+        } else {
+            //set default type otherwise
+            $out = self::$similarityTypes[0];
         }
         return $out;
     }
@@ -55,7 +73,7 @@ class Rerank {
             case "title_similarity":
                 $this->rerankByTitleSimilarity();
                 break;
-            
+
             case "views":
                 $this->rerankByViews();
                 break;
@@ -172,21 +190,26 @@ class Rerank {
             $this->setCommitted(false);
             return;
         }
+        $this->setSimilarityType($_REQUEST["similarity_type"]);
         $this->setTitleSimilarityPattern($sp_req);
 
         $this->assignSimilarityToPhotos();
 
-        $arr = $this->search->getResultPhotos();
+        $arr = $this->search->getResultPhotos(); //type is used inside
 
-        //this means: for comparing Array of Objects use callback compare function Rerank::cmpByDistance (musi byt static)
-        usort($arr, array("Rerank", "cmpByTitleSimilarityReversed"));
+        if ($this->getSimilarityType() == self::$similarityTypes[0]) {
+            //this means: for comparing Array of Objects use callback compare function Rerank::cmpByDistance (musi byt static)
+            usort($arr, array("Rerank", "cmpByTitleSimilarity"));
+        } else {
+            usort($arr, array("Rerank", "cmpByTitleSimilarityReversed"));
+        }
         $this->search->setResultPhotos($arr);
     }
 
     public function assignSimilarityToPhotos() {
         foreach ($this->search->getResultPhotos() as $p) {
             /* @var $p Photo */
-            $p->assignTitleSimilarityTo($this->getTitleSimilarityPattern());
+            $p->assignTitleSimilarityTo($this->getTitleSimilarityPattern(), $this->getSimilarityType() );
         }
     }
 
@@ -200,19 +223,27 @@ class Rerank {
             return -1; // <
     }
 
+    /**
+     * Reversed order of cmpByTitleSimilarity, used for version with similar_text, no need for this with levenshtein.
+     * @param Photo $photo1
+     * @param Photo $photo2
+     * @return integer -1 for >, 0 for =, 1 for <
+     */
     public static function cmpByTitleSimilarityReversed(Photo $photo1, Photo $photo2) {
         $res = self::cmpByTitleSimilarity($photo1, $photo2);
 
         return (-1) * $res;  // -1 => 1; 1=> -1, 0 zustava;
     }
 
-     //---------------rerank:views---------------------
+    //---------------rerank:views---------------------
     public static function cmpByViews(Photo $photo1, Photo $photo2) {
         $s1 = $photo1->getViews();
         $s2 = $photo2->getViews();
-        
-        if ($s1 < $s2) return 1;
-        if ($s1 > $s2) return -1;
+
+        if ($s1 < $s2)
+            return 1;
+        if ($s1 > $s2)
+            return -1;
         return 0; // =
     }
 
@@ -223,7 +254,6 @@ class Rerank {
         usort($arr, array("Rerank", "cmpByViews"));
         $this->search->setResultPhotos($arr);
     }
-
 
     /**
      * return center of the search/rerank
@@ -251,6 +281,14 @@ class Rerank {
 
     public function setType($type) {
         $this->type = self::fixType($type);
+    }
+
+    public function getSimilarityType() {
+        return $this->similarityType;
+    }
+
+    public function setSimilarityType($similarityType) {
+        $this->similarityType = self::fixSimilarityType($similarityType);
     }
 
     public function getTitleSimilarityPattern() {
