@@ -55,7 +55,7 @@ class UI {
         } else {
             $geo_lat = "";
             $geo_long = "";
-            $$title_similarity_pattern = "";
+            $title_similarity_pattern = "";
             $views_point="";
         }
 
@@ -74,6 +74,7 @@ class UI {
         $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
         $inputBlock = str_replace("{views_point}", $views_point, $inputBlock);
         $inputBlock = str_replace("{similarityTypeSelector}", $this->createSimilarityTypeSelector($this->rerank->getSimilarityType()), $inputBlock);
+        $inputBlock = str_replace("{MediaTypeOrderSelector}", $this->createMediaTypeOrderSelector($this->rerank->getMediaTypeOrder()), $inputBlock);
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
@@ -82,7 +83,7 @@ class UI {
 
         if ($this->search->isCommitted()) {
             //generate output
-            $output_imgs = $this->createAImgsTable($this->search->getResultPhotos());
+            $output_imgs = $this->createAImgsTable($this->search->getResultMedias());
             $heading = "<h1>Here it is:</h1>\n";
             $output = $heading . $output_imgs;
         } else {
@@ -93,12 +94,14 @@ class UI {
         $this->page = $page;
     }
 
-    public function createAImg(Photo $p) {
+    public function createAImg(Media $p) {
         $out = "";
         $out = "<h4>" . $p->getTitle() . "</h4>";
 
-        $img = "<img src=\"" . $p->getThumbnailUrl() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
-        $out .= "<a href=\"" . $p->getFullsizeUrl() . "\" >" . $img . "</a><br/>\n";
+        $img = "<img src=\"" . $p->getThumbnailSrc() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
+        $out .= "<a href=\"" . $p->getDirectUrl() . "\" >" . $img . "</a><br/>\n";
+        $out .= "<a href=\"" . $p->getPageUrl() . "\" >" . "original " . $p->getMediaType() . "</a><br/>\n";
+
 
         $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
 
@@ -194,6 +197,23 @@ class UI {
         $out .= "</select>";
         return $out;
     }
+
+
+      public function createMediaTypeOrderSelector($selected) {
+        $values = Rerank::$mediaTypeOrders;
+        $out = "<select name=\"media_type_order\">\n";
+
+        foreach ($values as $value) {
+            $add = "";
+            if ($value == $selected) {
+                $add = " selected";
+            }
+            $out .= "<option value=\"$value\"$add>$value</option>";
+        }
+        $out .= "</select>";
+        return $out;
+    }
+
 
     //------------setters, getters
 
