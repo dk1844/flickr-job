@@ -26,6 +26,7 @@ class Rerank {
     public static $similarityTypes = array(
         "levenshtein",
         "similar_text",
+        "lcs",
     );
     private $similarityType;
     private static $titleSimilarityPattern;

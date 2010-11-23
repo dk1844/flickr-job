@@ -39,8 +39,9 @@ class UI {
         $inputBlock = $this->inputTpl;
         $inputBlock = str_replace("{inputText}", htmlspecialchars($_REQUEST["input"]), $inputBlock);
         $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($this->search->getType()), $inputBlock);
+        $inputBlock = str_replace("{searchCountSelector}", $this->createSearchCountSelector($this->search->getSearchCount()), $inputBlock);
 
-        $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked" : ""), $inputBlock);
+        $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked=\"checked\"" : ""), $inputBlock);
 
 
 
@@ -51,20 +52,22 @@ class UI {
             $title_similarity_pattern = htmlspecialchars($_REQUEST["title_similarity_pattern"]);
             $views_point = htmlspecialchars($_REQUEST["views_point"]);
             
-
-            foreach (Rerank::$types as $value) {
-                $out = "";
-                if ($this->rerank->getType() == $value)
-                    $out = "checked=\"checked\"";
-                //e.g. {geo_rrTypeChecked}
-                $inputBlock = str_replace("{{$value}_rrTypeChecked}", $out, $inputBlock);
-            }
         } else {
             $geo_lat = "";
             $geo_long = "";
             $$title_similarity_pattern = "";
             $views_point="";
         }
+
+        foreach (Rerank::$types as $value) {
+                $out = "";
+                if ($this->rerank->getType() == $value)
+                    $out = "checked=\"checked\"";
+                //e.g. {geo_rrTypeChecked}
+                $inputBlock = str_replace("{" . $value . "_rrTypeChecked}", $out, $inputBlock);
+                //debug print "Nahrazuji: " . "{" . $value . "_rrTypeChecked}" . "<br/>";
+            }
+            
         $inputBlock = str_replace("{geo_lat}", $geo_lat, $inputBlock);
         $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
 
@@ -165,6 +168,21 @@ class UI {
     public function createSimilarityTypeSelector($selected) {
         $values = Rerank::$similarityTypes;
         $out = "<select name=\"similarity_type\">\n";
+
+        foreach ($values as $value) {
+            $add = "";
+            if ($value == $selected) {
+                $add = " selected";
+            }
+            $out .= "<option value=\"$value\"$add>$value</option>";
+        }
+        $out .= "</select>";
+        return $out;
+    }
+
+    public function createSearchCountSelector($selected) {
+        $values = Search::$counts;
+        $out = "<select name=\"searchCount\">\n";
 
         foreach ($values as $value) {
             $add = "";
