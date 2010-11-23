@@ -38,7 +38,7 @@ class UI {
     public function buildUI() {
         $inputBlock = $this->inputTpl;
         $inputBlock = str_replace("{inputText}", htmlspecialchars($_REQUEST["input"]), $inputBlock);
-        $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($_REQUEST["searchType"]), $inputBlock);
+        $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($this->search->getType()), $inputBlock);
 
         $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked" : ""), $inputBlock);
 
@@ -49,6 +49,7 @@ class UI {
             $geo_long = htmlspecialchars($_REQUEST["geo_long"]);
 
             $title_similarity_pattern = htmlspecialchars($_REQUEST["title_similarity_pattern"]);
+            
 
             foreach (Rerank::$types as $value) {
                 $out = "";
@@ -66,6 +67,7 @@ class UI {
         $inputBlock = str_replace("{geo_long}", $geo_long, $inputBlock);
 
         $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
+        $inputBlock = str_replace("{similarityTypeSelector}", $this->createSimilarityTypeSelector($this->rerank->getSimilarityType()), $inputBlock);
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
@@ -151,6 +153,21 @@ class UI {
     public function createSearchTypeSelector($selected) {
         $values = Search::$types;
         $out = "<select name=\"searchType\">\n";
+
+        foreach ($values as $value) {
+            $add = "";
+            if ($value == $selected) {
+                $add = " selected";
+            }
+            $out .= "<option value=\"$value\"$add>$value</option>";
+        }
+        $out .= "</select>";
+        return $out;
+    }
+
+    public function createSimilarityTypeSelector($selected) {
+        $values = Rerank::$similarityTypes;
+        $out = "<select name=\"similarity_type\">\n";
 
         foreach ($values as $value) {
             $add = "";
