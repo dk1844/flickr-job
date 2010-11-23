@@ -14,9 +14,10 @@
  */
 class Search {
     const DEFAULT_COUNT = 20;
-    const EXTRAS = 'description, license, date_upload, date_taken,
-        owner_name, last_update, media, geo, tags, views, url_t';
+    //const EXTRAS = 'description, license, date_upload, date_taken,
+    //    owner_name, last_update, media, geo, tags, views, url_t';
 
+    const EXTRAS = "description, license, date_upload, date_taken, owner_name, icon_server, original_format, last_update, geo, tags, machine_tags, o_dims, views, media, path_alias, url_sq, url_t, url_s, url_m, url_o";
     // original_format,
     //available search types, 0 is default
     //media rozlisovat?
@@ -32,7 +33,7 @@ class Search {
     private $type;
     private $result; //array thingy
     private $f; // flickr object
-    private $resultPhotos = array(); //array of photos
+    private $resultMedias = array(); //array of medias
     private $message;
     private $committed;
     private $searchCount;
@@ -43,6 +44,8 @@ class Search {
         $this->f = $f;
         $this->message = '';
         $this->committed = false;
+        $this->searchCount = self::DEFAULT_COUNT;
+
     }
 
     public static function fixType($type) {
@@ -132,13 +135,13 @@ class Search {
 
         //all kinds of searches filled in result if committed succesfully.
         if ($this->isCommitted()) {
-            $this->processResultIntoPhotos();
+            $this->processResultIntoMedias();
         }
     }
 
-    public function processResultIntoPhotos() {
+    public function processResultIntoMedias() {
         if (empty($this->result)) { //on error or something
-            $this->resultPhotos = array();
+            $this->resultMedias = array();
             return 0;
         }
 
@@ -146,13 +149,22 @@ class Search {
         //print "<pre>";
         //print_r($this->result);
         //print "</pre>";
-        //create Photo for each photo and fill it with data
-        foreach ($this->result["photo"] as $ph_args) {
-            $p = new Photo($ph_args, $this->f);
-            $p->setData($ph_args);
+        //create Media for each photo and fill it with data
 
-            //add the photo to the list
-            $this->addResultPhoto($p);
+        foreach ($this->result["photo"] as $ph_args) {
+
+            if ($ph_args["media"] == "photo") {
+                //print "creating photo<br>";
+                $p = new Photo($ph_args, $this->f);
+            } else {
+                  //print "creating video<br>";
+                 $p = new Video($ph_args, $this->f);
+            }
+            //$p = new Media($ph_args, $this->f);
+            
+
+            //add the media to the list
+            $this->addResultMedia($p);
         }
     }
 
@@ -170,24 +182,24 @@ class Search {
         $this->setResult("");
     }
 
-    public function clearResultPhotos() {
-        $this->resultPhotos = array();
+    public function clearResultMedias() {
+        $this->resultMedias = array();
     }
 
-    public function getResultPhotosCount() {
-        return count($this->resultPhotos);
+    public function getResultMediasCount() {
+        return count($this->resultMedias);
     }
 
-    public function addResultPhoto(Photo $p) {
-        $this->resultPhotos[] = $p;
+    public function addResultMedia(Media $p) {
+        $this->resultMedias[] = $p;
     }
 
-    public function getResultPhotos() {
-        return $this->resultPhotos;
+    public function getResultMedias() {
+        return $this->resultMedias;
     }
 
-    public function setResultPhotos($result) {
-        $this->resultPhotos = $result;
+    public function setResultMedias($result) {
+        $this->resultMedias = $result;
     }
 
     public function getType() {

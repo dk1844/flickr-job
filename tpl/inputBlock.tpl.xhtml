@@ -56,11 +56,22 @@
                     <td>
                         <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
                         <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label>
-                    </td>    
+                    </td>
                     <td>
                         Geo data:  &nbsp;
                         lat=<input name="geo_lat" type="text" value="{geo_lat}" />
                         long=<input name="geo_long" type="text" value="{geo_long}" />
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>
+                        <input type="radio" name="rerankType" value="media_type_order" id="rerank_mto" {media_type_order_rrTypeChecked} />
+                        <label for="rerank_mto">by <span class="rrTypeRadio">media type</span></label>
+                    </td>
+                    <td>
+                        Media type order:
+                        {MediaTypeOrderSelector}
                     </td>
                 </tr>
 
