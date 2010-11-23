@@ -100,14 +100,70 @@ class Photo {
         return $fullUrl;
     }
 
+    /**
+     * Finds out the length of the largest common substring from 2 strings, we dont care what it acually is :)
+     * Adapted from @link http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Longest_common_substring#PHP
+     * The above mentioned function was able to return all the longest substring, whereas we only need the length, so i simplified it a bit.
+     * @param string $str1 first string
+     * @param string $str2 second string
+     * @return int the length of lcs
+     */
+   public static function lcsLength($str1, $str2){
+	$str1Len = strlen($str1);
+	$str2Len = strlen($str2);
+	//$ret = array();
+
+	if($str1Len == 0 || $str2Len == 0)
+	return 0; //no similarities
+
+	$CSL = array(); //Common Sequence Length array
+	$intLargestSize = 0;
+
+	//initialize the CSL array to assume there are no similarities
+	for($i=0; $i<$str1Len; $i++){
+		$CSL[$i] = array();
+		for($j=0; $j<$str2Len; $j++){
+			$CSL[$i][$j] = 0;
+		}
+	}
+
+	for($i=0; $i<$str1Len; $i++){
+		for($j=0; $j<$str2Len; $j++){
+			//check every combination of characters
+			if( $str1[$i] == $str2[$j] ){
+				//these are the same in both strings
+				if($i == 0 || $j == 0)
+					//it's the first character, so it's clearly only 1 character long
+					$CSL[$i][$j] = 1;
+				else
+					//it's one character longer than the string from the previous character
+					$CSL[$i][$j] = $CSL[$i-1][$j-1] + 1;
+
+				if( $CSL[$i][$j] > $intLargestSize ){
+					//remember this as the largest
+					$intLargestSize = $CSL[$i][$j];
+					
+				}
+				
+			}
+			//else, $CSL should be set to 0, which it was already initialized to
+		}
+	}
+	return $intLargestSize;
+}
+
+
+
     public static function calcTitleSimilarity($title1, $title2, $type = "levenshtein") {
-        if (empty($title1) || empty($title2))
+        if ( (empty($title1) || empty($title2)) && $type != "levenshtein")
             return 0;
 
         if ($type == "similar_text")
             return similar_text(mb_strtolower($title1), mb_strtolower($title2)); //to lowercase;
-
-            return levenshtein(mb_strtolower($title1), mb_strtolower($title2));   //should be faster, has been adviced in a consult :)
+        if ($type == "lcs")
+            return self::lcsLength(mb_strtolower($title1), mb_strtolower($title2));
+        //otherwise
+            return levenshtein(mb_strtolower($title1), mb_strtolower($title2));   //should be faster than similar_text, has been adviced in a consult :)
     }
 
     public function calcTitleSimilarityTo($otherTitle, $type = "levenshtein") {

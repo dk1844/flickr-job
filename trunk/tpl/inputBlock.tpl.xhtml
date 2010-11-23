@@ -1,6 +1,7 @@
 <form action="." method="get">
     <input name="input" type="text" value="{inputText}" /><input type="submit" value="search" name="search" />
-    {searchTypeSelector}
+    {searchTypeSelector}  <br/>
+    # of results: {searchCountSelector}
 
     <fieldset>
         <legend>
@@ -24,7 +25,11 @@
                     <td>
                         Pattern:
                         <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
+                        Similarity model: 
                         {similarityTypeSelector}
+                        <span class="help" title="The lower the better. Indicates number of inseted, deleted or changed character to get from pattern to title.">Levenshtein?</span>
+                        <span class="help" title="The higher the better. Calculates number of characters both have in common.">Similar_text?</span>
+                        <span class="help" title='"Largest Common SubString" The higher the better. Calculates largest number of adjacent charachers both have in common.'>LCS?</span>
                     </td>
                 </tr>
 

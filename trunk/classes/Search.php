@@ -24,12 +24,18 @@ class Search {
         "text",
         "latest",
     ); // "date",  "popular",
+    public static $counts = array(
+        1, 2, 5,
+        10, 20, 50,
+        75, 100,
+    );
     private $type;
     private $result; //array thingy
     private $f; // flickr object
     private $resultPhotos = array(); //array of photos
     private $message;
     private $committed;
+    private $searchCount;
 
     public function __construct(phpFlickr $f) {
         //set default
@@ -37,27 +43,27 @@ class Search {
         $this->f = $f;
         $this->message = '';
         $this->committed = false;
-
-      
     }
 
     public static function fixType($type) {
-        $out = "";
-        if (in_array($type, self::$types)) {
-            //set chosen type
-            $out = $type;
-        } else {
-            //set default type otherwise
-            $out = self::$types[0];
-        }
-        return $out;
+        if (in_array($type, self::$types))
+            return $type;
+
+        //set default type otherwise
+        return self::$types[0];
+    }
+
+    public static function fixCount($count) {
+        if (in_array($count, self::$counts))
+            return $count;
+
+        //otherwise
+        return self::DEFAULT_COUNT;
     }
 
     public function setType($type) {
         $this->type = self::fixType($type);
     }
-
-    
 
     public function searchByDate($from = '', $to ='', $count = self::DEFAULT_COUNT) {
         $args = array();
@@ -78,10 +84,10 @@ class Search {
         $this->setResult($result);
     }
 
-    public function searchByKeyword($text, $count = self::DEFAULT_COUNT) {
+    public function searchByKeyword($text) {
         $args = array();
         $args['text'] = $text;
-        $args['per_page'] = $count;
+        $args['per_page'] = $this->getSearchCount();
         $args['extras'] = self::EXTRAS;
 
         if (empty($text)) {
@@ -99,27 +105,28 @@ class Search {
         $this->setResult($result);
     }
 
-    public function searchRecent($count = self::DEFAULT_COUNT) {
+    public function searchRecent() {
 
-        $result = $this->f->photos_getRecent(self::EXTRAS, $count);
+        $result = $this->f->photos_getRecent(self::EXTRAS, $this->getSearchCount());
 
         $this->setResult($result);
     }
 
-    public function genericSearch($count = self::DEFAULT_COUNT) {
+    public function genericSearch() {
         $this->resetMessage();
         $this->setType($_REQUEST["searchType"]); //being fixed inside!
+        $this->setSearchCount($_REQUEST["searchCount"]); //being fixed inside!
         $this->setCommitted(true);
-        
-       
+
+
         switch ($this->getType()) {
             default :
             case "text":
-                $this->searchByKeyword($_REQUEST["input"], $count);
+                $this->searchByKeyword($_REQUEST["input"]);
                 break;
 
             case "latest":
-                $this->searchRecent($count);
+                $this->searchRecent();
                 break;
         }
 
@@ -179,7 +186,7 @@ class Search {
         return $this->resultPhotos;
     }
 
-    public function setResultPhotos( $result ) {
+    public function setResultPhotos($result) {
         $this->resultPhotos = $result;
     }
 
@@ -207,7 +214,13 @@ class Search {
         $this->committed = $committed;
     }
 
-   
+    public function getSearchCount() {
+        return $this->searchCount;
+    }
+
+    public function setSearchCount($searchCount) {
+        $this->searchCount = self::fixCount($searchCount);
+    }
 
 }
 

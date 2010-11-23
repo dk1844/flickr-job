@@ -31,7 +31,7 @@ $ui = new UI($ms, $rr);
 //--------------------logic--------------------
 if (isset($_REQUEST["search"])) {
     //search and rerank?
-    $ms->genericSearch(10); //it will read REQUEST fields and decide what kind of search to do and whether or not to commit :)
+    $ms->genericSearch(); //it will read REQUEST fields and decide what kind of search to do and whether or not to commit :)
 
     if (isset($_REQUEST["rerank"])) {
         $rr->genericRerank();
