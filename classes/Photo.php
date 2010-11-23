@@ -26,6 +26,7 @@ class Photo {
     // rr vars
     private $rrDistance;
     private $titleSimilarity;
+    private $viewsDiff;
 
 
     /*
@@ -103,21 +104,36 @@ class Photo {
         if (empty($title1) || empty($title2))
             return 0;
 
-        if($type == "similar_text")
+        if ($type == "similar_text")
             return similar_text(mb_strtolower($title1), mb_strtolower($title2)); //to lowercase;
 
-        return levenshtein(mb_strtolower($title1), mb_strtolower($title2));   //should be faster, has been adviced in a consult :)
-
+            return levenshtein(mb_strtolower($title1), mb_strtolower($title2));   //should be faster, has been adviced in a consult :)
     }
+
     public function calcTitleSimilarityTo($otherTitle, $type = "levenshtein") {
         $this_title = $this->getTitle();
-        
+
         return Photo::calcTitleSimilarity($this->getTitle(), $otherTitle, $type);
     }
 
     public function assignTitleSimilarityTo($otherTitle, $type = "levenshtein") {
         $this->setTitleSimilarity($this->calcTitleSimilarityTo($otherTitle, $type));
     }
+
+     public function assignDistanceTo(Geo $otherPlace) {
+        if ($this->getGeo()->isValid()) {
+            $distance = Geo::calcDistance($otherPlace,$this->getGeo());
+            $this->setRrDistance($distance);
+        }
+    }
+
+
+
+    public function assignViewsDiffTo($views_point) {
+        $viewsDiff = abs($this->views-$views_point);
+        $this->setViewsDiff($viewsDiff);
+    }
+
 
 ///-------getters and setters-------------
 
@@ -223,6 +239,14 @@ class Photo {
 
     public function setTitleSimilarity($titleSimilarity) {
         $this->titleSimilarity = $titleSimilarity;
+    }
+
+    public function getViewsDiff() {
+        return $this->viewsDiff;
+    }
+
+    public function setViewsDiff($viewsDiff) {
+        $this->viewsDiff = $viewsDiff;
     }
 
 }
