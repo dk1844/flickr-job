@@ -15,12 +15,12 @@ class Video extends Media {
     public function __construct($args, phpFlickr $f) {
         parent::__construct($args, $f);
         $this->setMediaType("video");
-        $this->createPageDirectUrl(); //sets pageUrl & directUrl in ancestor
+        $this->createPage_DirectUrl_Dimensions(); //sets pageUrl & directUrl in ancestor
     }
 
     //overidy/implementy
 
-    public function createPageDirectUrl() {
+    public function createPage_DirectUrl_Dimensions() {
 
         $sizes_response = $this->getF()->photos_getSizes($this->getId());
         // e.g. :
@@ -47,6 +47,18 @@ class Video extends Media {
         
         
         $this->setDirectUrl($video_url);
+
+        $largest_index = count($sizes_response) - 1; //cus we want to give the "first video link", but the up to dimensions are the last ones..
+        $w = $sizes_response[$largest_index]["width"];
+        $h = $sizes_response[$largest_index]["height"];
+        $name = $sizes_response[$largest_index]["label"];
+
+        $this->setDimensions(new Dimensions($w, $h, $name));
+
+
+        
+
+
     }
 
 }

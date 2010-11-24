@@ -20,11 +20,12 @@ abstract class Media {
     private $ownerName;
     private $views;
     private $tags;
-    private $geo;
 
+    private $geo;
+    private $dimensions; //media type dependant, each descandant populates it differntly using setDimensions(...)
+    
     private $media_type;
     private $thumbnail_src;
-    
     private $pageUrl;
     private $directUrl;
     // rr vars
@@ -292,15 +293,13 @@ abstract class Media {
         $this->f = $f;
     }
 
-
-    public function  getMediaType() {
+    public function getMediaType() {
         return $this->media_type;
     }
 
-    public function  setMediaType($mediaType) {
+    public function setMediaType($mediaType) {
         $this->media_type = $mediaType;
     }
-
 
     public function getPageUrl() {
         return $this->pageUrl;
@@ -310,6 +309,24 @@ abstract class Media {
         $this->pageUrl = $pageUrl;
     }
 
+    /**
+     * Get dimension data
+     * @return Dimensions dim. object
+     */
+    public function getDimensions() {
+        return $this->dimensions;
+    }
+
+    /**
+     * Set dimension data
+     * @param Dimensions $dimensions dim. object
+     */
+    public function setDimensions($dimensions) {
+        $this->dimensions = $dimensions;
+    }
+
+    //----------photo video specific
+
     public function getDirectUrl() {
         return $this->directUrl;
     }
@@ -318,10 +335,7 @@ abstract class Media {
         $this->directUrl = $directUrl;
     }
 
-    abstract public function createPageDirectUrl();
-    
-    
-
+    abstract public function createPage_DirectUrl_Dimensions();
 }
 
 ?>
