@@ -6,6 +6,7 @@ require_once('./classes/phpFlickr.php');
 require_once('./classes/Helper.php');
 
 require_once('./classes/Geo.php');
+require_once('./classes/Dimensions.php');
 require_once('./classes/Media.php');
 require_once('./classes/Video.php');
 require_once('./classes/Photo.php');

@@ -21,7 +21,8 @@ class Rerank {
         "views",
         "views_diff",
         "geo",
-        "media_type_order"
+        "media_type_order",
+        "dimensions",
     );
     private $type;
     public static $similarityTypes = array(
@@ -94,6 +95,10 @@ class Rerank {
 
             case "media_type_order":
                 $this->rerankByMediaTypeOrder();
+                break;
+
+            case "dimensions":
+                $this->rerankByDimensions();
                 break;
         }
     }
@@ -320,7 +325,7 @@ class Rerank {
         } else {
             usort($arr, array("Rerank", "cmpByMediaTypeOrderReversed"));
         }
-        
+
         $this->search->setResultMedias($arr);
     }
 
@@ -332,7 +337,7 @@ class Rerank {
         if ($s1 == $s2)
             return 0; //=
 
-        if ($s1 == "video")
+            if ($s1 == "video")
             return 1;
         //otherwise
         return -1;
@@ -342,8 +347,27 @@ class Rerank {
         return self::cmpByMediaTypeOrder($media1, $media2) * (-1);
     }
 
+//----------------rerank by media order type---------------
+    public function rerankByDimensions() {
 
-    
+        $arr = $this->search->getResultMedias();
+        usort($arr, array("Rerank", "cmpByDimensions"));
+        $this->search->setResultMedias($arr);
+
+    }
+
+    public static function cmpByDimensions(Media $media1, Media $media2) {
+
+        $s1 = $media1->getDimensions()->getArea();
+        $s2 = $media2->getDimensions()->getArea();
+
+        if ($s1 < $s2)
+            return 1; //<
+        if ($s1 > $s2)
+            return -1; // >
+        return 0; // =
+    }
+
     /**
      * return center of the search/rerank
      * @return Geo  position

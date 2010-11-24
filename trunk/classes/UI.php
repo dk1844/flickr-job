@@ -102,6 +102,8 @@ class UI {
         $out .= "<a href=\"" . $p->getDirectUrl() . "\" >" . $img . "</a><br/>\n";
         $out .= "<a href=\"" . $p->getPageUrl() . "\" >" . "original " . $p->getMediaType() . "</a><br/>\n";
 
+        $out .= "Max size: <span title=\"" . $p->getDimensions()->getName() .  "\">".
+                $p->getDimensions()->getWidth() . "x" . $p->getDimensions()->getHeight() . "</span><br/>" ;
 
         $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
 
@@ -118,6 +120,7 @@ class UI {
                 $out .= "Distance = " . round($p->getRrDistance(),UI::GEO_UI_PRECISION) . "km";
             }
         }
+
 
         if ($this->rerank->getType() == "title_similarity") {
             $out .= "title_similarity = " . $p->getTitleSimilarity() . "<br/>\n";

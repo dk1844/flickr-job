@@ -19,13 +19,13 @@ class Photo extends Media {
         parent::__construct($args, $f);
         $this->setMediaType("photo");
 
-        $this->createPageDirectUrl(); //sets pageUrl & directUrl in ancestor
+        $this->createPage_DirectUrl_Dimensions(); //sets pageUrl & directUrl in ancestor
     }
 
    
      //overidy/implementy
 
-    public function createPageDirectUrl() {
+    public function createPage_DirectUrl_Dimensions() {
         $sizes_response = $this->getF()->photos_getSizes($this->getId());
 
         //print "<pre>";
@@ -48,6 +48,26 @@ class Photo extends Media {
 
         $this->setDirectUrl($direct_fullsize);
         $this->setPageUrl($pageUrl);
+
+        /*
+        This is what the source looks like, let's use it..
+
+        [5] => Array
+        (
+            [label] => Large
+            [width] => 540
+            [height] => 720
+            [source] => http://farm5.static.flickr.com/4126/5170830064_9f674c2f00_b.jpg
+            [url] => http://www.flickr.com/photos/paleeek9/5170830064/sizes/l/
+            [media] => photo
+        )
+         */
+
+        $w = $sizes_response[$largest_index]["width"];
+        $h = $sizes_response[$largest_index]["height"];
+        $name = $sizes_response[$largest_index]["label"];
+
+        $this->setDimensions(new Dimensions($w, $h, $name));
 
     }
 
