@@ -23,6 +23,7 @@ class Rerank {
         "geo",
         "media_type_order",
         "dimensions",
+        "upload_date"
     );
     private $type;
     public static $similarityTypes = array(
@@ -38,6 +39,11 @@ class Rerank {
         "videos_photos",
     );
     private $mediaTypeOrder;
+    public static $uploadDateOrders = array(
+        "newest_first",
+        "oldest_first",
+    );
+    private $uploadDateOrder;
 
     public function __construct(Search $s) {
         $this->search = $s;
@@ -46,6 +52,7 @@ class Rerank {
         $this->similarityType = self::$similarityTypes[0]; //levenshtein
         $this->views_point = 0;
         $this->mediaTypeOrder = self::$mediaTypeOrders[0];
+        $this->uploadDateOrder = self::$uploadDateOrders[0];
     }
 
     public static function fixType($type) {
@@ -64,6 +71,12 @@ class Rerank {
     public static function fixMediaTypeOrder($mtype) {
         if (in_array($mtype, self::$mediaTypeOrders))
             return $mtype;
+        return self::$mediaTypeOrders[0];
+    }
+
+    public static function fixUploadDateOrder($dtype) {
+        if (in_array($dtype, self::$uploadDateOrders))
+            return $dtype;
         return self::$mediaTypeOrders[0];
     }
 
@@ -99,6 +112,10 @@ class Rerank {
 
             case "dimensions":
                 $this->rerankByDimensions();
+                break;
+
+            case "upload_date":
+                $this->rerankByUploadedDate();
                 break;
         }
     }
@@ -337,7 +354,7 @@ class Rerank {
         if ($s1 == $s2)
             return 0; //=
 
-            if ($s1 == "video")
+        if ($s1 == "video")
             return 1;
         //otherwise
         return -1;
@@ -353,7 +370,6 @@ class Rerank {
         $arr = $this->search->getResultMedias();
         usort($arr, array("Rerank", "cmpByDimensions"));
         $this->search->setResultMedias($arr);
-
     }
 
     public static function cmpByDimensions(Media $media1, Media $media2) {
@@ -366,6 +382,38 @@ class Rerank {
         if ($s1 > $s2)
             return -1; // >
         return 0; // =
+    }
+
+    //-------------rerank by uploaded date---------
+    public function rerankByUploadedDate() {
+        $arr = $this->search->getResultMedias();
+
+        $this->setUploadDateOrder($_REQUEST["upload_date_order"]);
+
+        if ($this->getUploadDateOrder() == self::$uploadDateOrders[0]) {
+            usort($arr, array("Rerank", "cmpByUploadedDate"));
+        } else {
+            usort($arr, array("Rerank", "cmpByUploadedDateReversed"));
+        }
+
+        $this->search->setResultMedias($arr);
+    }
+
+    public static function cmpByUploadedDate(Media $media1, Media $media2) {
+
+
+        $s1 = $media1->getDateUpload(); //unix date
+        $s2 = $media2->getDateUpload();
+
+        if ($s1 < $s2)
+            return 1; //<
+        if ($s1 > $s2)
+            return -1; // >
+        return 0; // =
+    }
+
+    public static function cmpByUploadedDateReversed(Media $media1, Media $media2) {
+        return self::cmpByUploadedDate($media1, $media2) * (-1);
     }
 
     /**
@@ -426,6 +474,14 @@ class Rerank {
 
     public function setMediaTypeOrder($mediaTypeOrder) {
         $this->mediaTypeOrder = self::fixMediaTypeOrder($mediaTypeOrder);
+    }
+
+    public function getUploadDateOrder() {
+        return $this->uploadDateOrder;
+    }
+
+    public function setUploadDateOrder($uploadDateOrder) {
+        $this->uploadDateOrder = self::fixUploadDateOrder($uploadDateOrder);
     }
 
 }

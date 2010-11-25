@@ -3,11 +3,16 @@
 function rerank_disable(how){
     if(how != "fade") {
         $("#rr_details").hide();
+        $("#rr_fieldset").attr("class", "collapsed")
+        $("#rr_details input, #rr_details select").attr('disabled','disabled');
+        
     } else {
-        $("#rr_details").slideUp(1000);
+        $("#rr_details").slideUp(1000, function(){
+            $("#rr_fieldset").attr("class", "collapsed") //this means do it after animation!
+            $("#rr_details input, #rr_details select").attr('disabled','disabled');
+        });
     }
-    $("#rr_fieldset").attr("class", "collapsed")
-    $("#rr_details input, #rr_details select").attr('disabled','disabled');
+    
 //$("rerank_cb").click();
 
 }
@@ -33,25 +38,36 @@ function disable_all_rerank_details(how){
         var detail_name = controller_name  +  "_detail";
 
         //alert(detail_name);
+
         
         if ($(controller_name).attr("checked")) {
+            //enable it right away
+            $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled');
+            
             //show it
             if(how != "fade") {
                 $(detail_name).show();
+                
             } else {
-                $(detail_name).fadeIn(1000);
+                $(detail_name).fadeIn(1000, function(){
+                     $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled'); //if clicking fast, disable could be last, this fixes it
+                });
                 
             }
-            $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled');
+            
+             //alert("disRem:" + detail_name);
            
         } else {
             //hide it
             if(how != "fade") {
                 $(detail_name).hide();
+                $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
             } else {
-                $(detail_name).fadeOut(1000);
+                $(detail_name).fadeOut(1000, function(){ //disable later. so it seem enabled all the time, but is disabled when submitting
+                    $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
+                });
             }
-            $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
+            
             
         }
 

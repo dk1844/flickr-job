@@ -75,6 +75,7 @@ class UI {
         $inputBlock = str_replace("{views_point}", $views_point, $inputBlock);
         $inputBlock = str_replace("{similarityTypeSelector}", $this->createSimilarityTypeSelector($this->rerank->getSimilarityType()), $inputBlock);
         $inputBlock = str_replace("{MediaTypeOrderSelector}", $this->createMediaTypeOrderSelector($this->rerank->getMediaTypeOrder()), $inputBlock);
+        $inputBlock = str_replace("{uploadDateOrderSelector}", $this->createUploadDateOrderSelector($this->rerank->getUploadDateOrder()), $inputBlock);
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
@@ -218,6 +219,20 @@ class UI {
         return $out;
     }
 
+     public function createUploadDateOrderSelector($selected) {
+        $values = Rerank::$uploadDateOrders;
+        $out = "<select name=\"upload_date_order\">\n";
+
+        foreach ($values as $value) {
+            $add = "";
+            if ($value == $selected) {
+                $add = " selected";
+            }
+            $out .= "<option value=\"$value\"$add>$value</option>";
+        }
+        $out .= "</select>";
+        return $out;
+    }
 
     //------------setters, getters
 
