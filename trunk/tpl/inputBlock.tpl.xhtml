@@ -3,83 +3,91 @@
     {searchTypeSelector}  <br/>
     # of results: {searchCountSelector}
 
-    <fieldset>
+    <fieldset id="rr_fieldset">
         <legend>
             <input type="checkbox" name="rerank" value="rerank" id="rerank_cb" {rerank_selected} /><label for="rerank_cb">Rerank</label>
         </legend>
-        <div class="rr_detail" >
+        <div id="rr_details" >
 
             <table>
                 <tr>
                     <td colspan="2">
-                        <input type="radio" name="rerankType" value="title" id="rerank_t"  {title_rrTypeChecked} />
-                        <label for="rerank_t">by <span class="rrTypeRadio">title</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="title" id="rerank_title"  {title_rrTypeChecked} />
+                        <label for="rerank_title">by <span class="rrTypeRadio">title</span></label>
                     </td>
                 </tr>
 
                 <tr>
                     <td>
-                        <input type="radio" name="rerankType" value="title_similarity" id="rerank_ts"  {title_similarity_rrTypeChecked} />
-                        <label for="rerank_ts">by <span class="rrTypeRadio">title similarity</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="title_similarity" id="rerank_title_similarity"  {title_similarity_rrTypeChecked} />
+                        <label for="rerank_title_similarity">by <span class="rrTypeRadio">title similarity</span></label>
                     </td>
                     <td>
-                        Pattern:
-                        <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
-                        Similarity model: 
-                        {similarityTypeSelector}
-                        <span class="help" title="The lower the better. Indicates number of inseted, deleted or changed character to get from pattern to title.">Levenshtein?</span>
-                        <span class="help" title="The higher the better. Calculates number of characters both have in common.">Similar_text?</span>
-                        <span class="help" title='"Largest Common SubString" The higher the better. Calculates largest number of adjacent charachers both have in common.'>LCS?</span>
+                        <div id="rerank_title_similarity_detail" class="detail">
+                            Pattern:
+                            <input type="text" name="title_similarity_pattern" value="{title_similarity_pattern}" />
+                            Similarity model:
+                            {similarityTypeSelector}
+                            <span class="help" title="The lower the better. Indicates number of inseted, deleted or changed character to get from pattern to title.">Levenshtein?</span>
+                            <span class="help" title="The higher the better. Calculates number of characters both have in common.">Similar_text?</span>
+                            <span class="help" title='"Largest Common SubString" The higher the better. Calculates largest number of adjacent charachers both have in common.'>LCS?</span>
+                        </div>
                     </td>
                 </tr>
 
                 <tr>
                     <td coslspan="2">
-                        <input type="radio" name="rerankType" value="views" id="rerank_w"  {views_rrTypeChecked} />
-                        <label for="rerank_w">by <span class="rrTypeRadio">views</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="views" id="rerank_views"  {views_rrTypeChecked} />
+                        <label for="rerank_views">by <span class="rrTypeRadio">views</span></label>
                     </td>
                 </tr>
 
                 <tr>
                     <td>
-                        <input type="radio" name="rerankType" value="views_diff" id="rerank_wd"  {views_diff_rrTypeChecked} />
-                        <label for="rerank_wd">by <span class="rrTypeRadio">views difference to:</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="views_diff" id="rerank_views_diff"  {views_diff_rrTypeChecked} />
+                        <label for="rerank_views_diff">by <span class="rrTypeRadio">views difference to:</span></label>
                     </td>
                     <td>
-                        Your guess:
-                        <input type="text" name="views_point" value="{views_point}" />
+                        <div id="rerank_views_diff_detail" class="detail">
+                            Your guess:
+                            <input type="text" name="views_point" value="{views_point}" />
+                        </div>
                     </td>
                 </tr>
 
 
                 <tr>
                     <td>
-                        <input type="radio" name="rerankType" value="geo" id="rerank_g" {geo_rrTypeChecked} />
-                        <label for="rerank_g">by <span class="rrTypeRadio">geo</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="geo" id="rerank_geo" {geo_rrTypeChecked} />
+                        <label for="rerank_geo">by <span class="rrTypeRadio">geo</span></label>
                     </td>
                     <td>
-                        Geo data:  &nbsp;
-                        lat=<input name="geo_lat" type="text" value="{geo_lat}" />
-                        long=<input name="geo_long" type="text" value="{geo_long}" />
+                         <div id="rerank_geo_detail" class="detail">
+                            Geo data:  &nbsp;
+                            lat=<input name="geo_lat" type="text" value="{geo_lat}" />
+                            long=<input name="geo_long" type="text" value="{geo_long}" />
+                         </div>
                     </td>
                 </tr>
 
                  <tr>
                     <td>
-                        <input type="radio" name="rerankType" value="media_type_order" id="rerank_mto" {media_type_order_rrTypeChecked} />
-                        <label for="rerank_mto">by <span class="rrTypeRadio">media type</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="media_type_order" id="rerank_media_type_order" {media_type_order_rrTypeChecked} />
+                        <label for="rerank_media_type_order">by <span class="rrTypeRadio">media type</span></label>
                     </td>
                     <td>
-                        Media type order:
-                        {MediaTypeOrderSelector}
+                        <div id="rerank_media_type_order_detail" class="detail">
+                            Media type order:
+                            {MediaTypeOrderSelector}
+                        </div>
                     </td>
                 </tr>
 
                 <table>
                 <tr>
                     <td colspan="2">
-                        <input type="radio" name="rerankType" value="dimensions" id="rerank_d"  {dimensions_rrTypeChecked} />
-                        <label for="rerank_d">by <span class="rrTypeRadio">dimensions</span></label>
+                        <input type="radio" class="rerankType" name="rerankType" value="dimensions" id="rerank_dimensions"  {dimensions_rrTypeChecked} />
+                        <label for="rerank_dimensions">by <span class="rrTypeRadio">dimensions</span></label>
                     </td>
                 </tr>
 
