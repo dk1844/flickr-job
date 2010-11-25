@@ -46,17 +46,25 @@
 }
 
 #rr_fieldset {
-    background: #ffcc99;
+   line-height: 150%;
+       padding: 0px 12px;
 }
 
 #rr_fieldset.expanded {
     border: 1px solid black;
+     /* background: #ffcc99; */
 }
 #rr_fieldset.collapsed {
-    border: 1px dotted maroon;
+    border: dotted maroon;
+    border-width: 1px 0 0 0;
 }
 
-.input_search, .input_rerank {
-    padding: 4px 15px;
+.input_search,
+.input_rerank {
+    padding:10px 20px;
 
+}
+
+.input_rerank {
+     background: #ffcc99;
 }

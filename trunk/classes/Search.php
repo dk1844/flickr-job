@@ -68,7 +68,7 @@ class Search {
         $this->type = self::fixType($type);
     }
 
-    
+    //search by date? Maybe if there's time.. probably not.
 
     public function searchByKeyword($text) {
         $args = array();
