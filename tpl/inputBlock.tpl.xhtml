@@ -1,8 +1,19 @@
 <form action="." method="get">
     <div class="input_search" >
-    <input name="input" type="text" value="{inputText}" /><input type="submit" value="search" name="search" />
-    {searchTypeSelector}  
-    # of results: {searchCountSelector}
+        <input name="input" type="text" value="{inputText}" /><input type="submit" value="search" name="search" />
+        {searchTypeSelector}
+        # of results: {searchCountSelector}
+        {inputDatesSelector}
+
+        <span id="input_date_from_detail">
+            <label for="input_date_from">From date: </label>
+            <input type="text" id="input_date_from" class="date_input" name="input_date_from" value="{input_date_from}" />
+        </span>
+        
+        <span id="input_date_to_detail">
+          <label for="input_date_to">To date: </label>
+          <input type="text" id="input_date_to" class="date_input" name="input_date_to" value="{input_date_to}" />
+        </span>
     </div>
     <div class="input_rerank">
     <fieldset id="rr_fieldset" class="expanded">

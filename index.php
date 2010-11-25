@@ -48,5 +48,8 @@ $ui->buildUI();
 //print everything out;
 print $ui->getPage();
 
+//tryout
+//print Helper::czStrToUnixDate("1.12.2010");
+//print Helper::czUnixDateToStr(1211158000);
 
 ?>
