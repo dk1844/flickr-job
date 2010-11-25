@@ -6,7 +6,7 @@ function rerank_disable(how){
     } else {
         $("#rr_details").slideUp(1000);
     }
-    $("#rr_fieldset").attr("style", "border:0px;")
+    $("#rr_fieldset").attr("class", "collapsed")
     $("#rr_details input, #rr_details select").attr('disabled','disabled');
 //$("rerank_cb").click();
 
@@ -18,9 +18,9 @@ function rerank_enable(how) {
     } else {
         $("#rr_details").slideDown(1000);
     }
-    $("#rr_fieldset").removeAttr("style");
+    $("#rr_fieldset").attr("class", "expanded")
     $("#rr_details input, #rr_details select").removeAttr('disabled');
-    disable_all_rerank_details();
+    disable_all_rerank_details(); //fixes unchanged value from the last time!
 //$("rerank_cb").click();
 
 }
