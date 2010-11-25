@@ -20,10 +20,9 @@ abstract class Media {
     private $ownerName;
     private $views;
     private $tags;
-
+    private $dateUpload;
     private $geo;
     private $dimensions; //media type dependant, each descandant populates it differntly using setDimensions(...)
-    
     private $media_type;
     private $thumbnail_src;
     private $pageUrl;
@@ -83,6 +82,9 @@ abstract class Media {
         $this->ownerName = $args["ownername"];
         $this->views = $args["views"];
         $this->tags = $args["tags"];
+
+
+        $this->setDateUpload($args["dateupload"]);
 
         // acc = 0 => this means no geo is given by the author => invalid geo ( , , true)
         $this->geo = new Geo($args["latitude"], $args["longitude"], $args["accuracy"] == 0);
@@ -172,6 +174,18 @@ abstract class Media {
     public function assignViewsDiffTo($views_point) {
         $viewsDiff = abs($this->views - $views_point);
         $this->setViewsDiff($viewsDiff);
+    }
+
+    /**
+     * fixes date in unix stamp format
+     * @param integer $date
+     * @return integer fixed date
+     */
+    public static function fixDate($date) {
+
+        if ($date == 0 || $date == "")
+            return date("U"); //today/now
+ return $date;
     }
 
 ///-------getters and setters-------------
@@ -323,6 +337,18 @@ abstract class Media {
      */
     public function setDimensions($dimensions) {
         $this->dimensions = $dimensions;
+    }
+
+    public function getDateUpload() {
+        return $this->dateUpload;
+    }
+
+    /**
+     *  Sets / fixed date
+     * @param integer $dateUpload date in unix stamp format
+     */
+    public function setDateUpload($dateUpload) {
+        $this->dateUpload = self::fixDate($dateUpload);
     }
 
     //----------photo video specific

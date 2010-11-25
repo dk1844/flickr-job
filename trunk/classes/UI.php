@@ -106,6 +106,7 @@ class UI {
                 $p->getDimensions()->getWidth() . "x" . $p->getDimensions()->getHeight() . "</span><br/>" ;
 
         $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
+        $out .= "Upload date: " . date("j.n.Y H:i", $p->getDateUpload()) ."<br/>\n";
 
        // if($this->rerank->getViews_point() != 0) {
        //     $out .= "ViewsDiff: " . $p->getViewsDiff() ."<br/>\n";

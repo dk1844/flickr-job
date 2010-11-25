@@ -13,13 +13,14 @@ function rerank_disable(how){
 }
 
 function rerank_enable(how) {
-     if(how != "fade") {
+    if(how != "fade") {
         $("#rr_details").show();
-     } else {
+    } else {
         $("#rr_details").slideDown(1000);
-     }
-     $("#rr_fieldset").removeAttr("style");
+    }
+    $("#rr_fieldset").removeAttr("style");
     $("#rr_details input, #rr_details select").removeAttr('disabled');
+    disable_all_rerank_details();
 //$("rerank_cb").click();
 
 }
@@ -58,6 +59,30 @@ function disable_all_rerank_details(how){
 
 }
 
+function my_date_input_extend() {
+    
+    $.extend(DateInput.DEFAULT_OPTS, {
+        stringToDate: function(string) {
+            var matches;
+                                    // for czech-alike date: 2.12.2011
+            if (matches = string.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4,4})$/)) {
+                return new Date(matches[3], matches[2] - 1, matches[1]);
+            } else {
+                return new Date; //today on error
+            };
+        },
+
+        dateToString: function(date) {
+            var month = (date.getMonth() + 1).toString();
+            var dom = date.getDate().toString();
+            if (month.length == 1) month = "0" + month;
+            if (dom.length == 1) dom = "0" + dom;
+            return  dom + "." + month + "." + date.getFullYear();
+        }
+    });
+
+}
+
 
 
 $(document).ready(function(){
@@ -66,8 +91,13 @@ $(document).ready(function(){
     if (!$('#rerank_cb').attr("checked")) {
         rerank_disable();
     }
-    //all of them
+    //details hide
     disable_all_rerank_details();
+
+    //setup date input;
+    my_date_input_extend();
+    $(".date_input").date_input();
+
 
 
 
