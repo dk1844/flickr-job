@@ -38,11 +38,23 @@ class UI {
     public function buildUI() {
         $inputBlock = $this->inputTpl;
         $inputBlock = str_replace("{inputText}", htmlspecialchars($_REQUEST["input"]), $inputBlock);
-        $inputBlock = str_replace("{searchTypeSelector}", $this->createSearchTypeSelector($this->search->getType()), $inputBlock);
-        $inputBlock = str_replace("{searchCountSelector}", $this->createSearchCountSelector($this->search->getSearchCount()), $inputBlock);
+        $inputBlock = str_replace("{searchTypeSelector}", $this->createGenericSelector(Search::$types, "searchType", $this->search->getType()), $inputBlock);
+        $inputBlock = str_replace("{searchCountSelector}", $this->createGenericSelector(Search::$counts, "searchCount", $this->search->getSearchCount()), $inputBlock);
+
+        $inputBlock = str_replace("{inputDatesSelector}", $this->createGenericSelector(Search::$input_date_types, "input_date_type", $this->search->getInputDateType()), $inputBlock);
+
 
         $inputBlock = str_replace("{rerank_selected}", (isset($_REQUEST["rerank"]) ? "checked=\"checked\"" : ""), $inputBlock);
 
+        if($_REQUEST["input_date_type"] != "no_dates") {
+            $from = htmlspecialchars($_REQUEST["input_date_from"]);
+            $to = htmlspecialchars($_REQUEST["input_date_to"]);
+        } else {
+            $from = "";
+            $to = "";
+        }
+         $inputBlock = str_replace("{input_date_from}", $from, $inputBlock);
+         $inputBlock = str_replace("{input_date_to}", $to, $inputBlock);
 
 
         if (isset($_REQUEST["rerank"])) {
@@ -73,9 +85,9 @@ class UI {
 
         $inputBlock = str_replace("{title_similarity_pattern}", $title_similarity_pattern, $inputBlock);
         $inputBlock = str_replace("{views_point}", $views_point, $inputBlock);
-        $inputBlock = str_replace("{similarityTypeSelector}", $this->createSimilarityTypeSelector($this->rerank->getSimilarityType()), $inputBlock);
-        $inputBlock = str_replace("{MediaTypeOrderSelector}", $this->createMediaTypeOrderSelector($this->rerank->getMediaTypeOrder()), $inputBlock);
-        $inputBlock = str_replace("{uploadDateOrderSelector}", $this->createUploadDateOrderSelector($this->rerank->getUploadDateOrder()), $inputBlock);
+        $inputBlock = str_replace("{similarityTypeSelector}", $this->createGenericSelector(Rerank::$similarityTypes, "similarity_type", $this->rerank->getSimilarityType()), $inputBlock);
+        $inputBlock = str_replace("{MediaTypeOrderSelector}", $this->createGenericSelector(Rerank::$mediaTypeOrders, "media_type_order", $this->rerank->getMediaTypeOrder()), $inputBlock);
+        $inputBlock = str_replace("{uploadDateOrderSelector}", $this->createGenericSelector(Rerank::$uploadDateOrders, "upload_date_order",$this->rerank->getUploadDateOrder()), $inputBlock);
 
         $page = $this->pageTpl;
         $page = str_replace("{inputBlock}", $inputBlock, $page); //as seen above :)
@@ -157,7 +169,7 @@ class UI {
 
         return $out;
     }
-
+/* deprecated, genericSelector instead
     public function createSearchTypeSelector($selected) {
         $values = Search::$types;
         $out = "<select name=\"searchType\">\n";
@@ -232,6 +244,29 @@ class UI {
         }
         $out .= "</select>";
         return $out;
+    }
+ */
+    /**
+     *  Creates a html <select> structure.
+     * @param <type> $values array of options
+     * @param <type> $select_name name & id attribute
+     * @param <type> $selected selected value
+     * @return string
+     */
+    public function createGenericSelector($values, $select_name, $selected) {
+
+        $out = "<select name=\"" . $select_name . "\" id=\"" . $select_name . "\">\n";
+
+        foreach ($values as $value) {
+            $add = "";
+            if ($value == $selected) {
+                $add = " selected";
+            }
+            $out .= "<option value=\"$value\"$add>$value</option>";
+        }
+        $out .= "</select>";
+        return $out;
+
     }
 
     //------------setters, getters
