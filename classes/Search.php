@@ -24,7 +24,7 @@ class Search {
     public static $types = array(
         "text",
         "latest",
-    ); // "date",  "popular",
+    ); 
     public static $counts = array(
         1, 2, 5,
         10, 20, 50,
@@ -68,24 +68,7 @@ class Search {
         $this->type = self::fixType($type);
     }
 
-    public function searchByDate($from = '', $to ='', $count = self::DEFAULT_COUNT) {
-        $args = array();
-
-        if (empty($from) && empty($to)) {
-            $args['min_upload_date'] = date("U") - 10 * 60; // last 10 min
-        } else {
-            if (!empty($from))
-                $args['min_upload_date'] = $from;
-            if (!empty($to))
-                $args['max_upload_date'] = $to;
-        }
-
-        $args['per_page'] = $count;
-        $args['extras'] = self::EXTRAS;
-
-        $result = $this->f->photos_search($args);
-        $this->setResult($result);
-    }
+    
 
     public function searchByKeyword($text) {
         $args = array();
