@@ -1,9 +1,11 @@
 <form action="." method="get">
+    <div class="input_search" >
     <input name="input" type="text" value="{inputText}" /><input type="submit" value="search" name="search" />
-    {searchTypeSelector}  <br/>
+    {searchTypeSelector}  
     # of results: {searchCountSelector}
-
-    <fieldset id="rr_fieldset">
+    </div>
+    <div class="input_rerank">
+    <fieldset id="rr_fieldset" class="expanded">
         <legend>
             <input type="checkbox" name="rerank" value="rerank" id="rerank_cb" {rerank_selected} /><label for="rerank_cb">Rerank</label>
         </legend>
@@ -108,4 +110,5 @@
 
         </div>
     </fieldset>
+    </div>
 </form>

@@ -11,6 +11,11 @@
    Syntax recommendation http://www.w3.org/TR/REC-CSS2/
 */
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 .rrTypeRadio {
     font-weight: bold;
     color: firebrick;
@@ -33,5 +38,25 @@
 }
 
 #rr_fieldset {
+
+}
+
+.input {
+    background: #99ff99;
+}
+
+#rr_fieldset {
+    background: #ffcc99;
+}
+
+#rr_fieldset.expanded {
+    border: 1px solid black;
+}
+#rr_fieldset.collapsed {
+    border: 1px dotted maroon;
+}
+
+.input_search, .input_rerank {
+    padding: 4px 15px;
 
 }
