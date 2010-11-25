@@ -83,11 +83,24 @@
                     </td>
                 </tr>
 
-                <table>
+                
                 <tr>
                     <td colspan="2">
                         <input type="radio" class="rerankType" name="rerankType" value="dimensions" id="rerank_dimensions"  {dimensions_rrTypeChecked} />
                         <label for="rerank_dimensions">by <span class="rrTypeRadio">dimensions</span></label>
+                    </td>
+                </tr>
+
+                 <tr>
+                    <td>
+                        <input type="radio" class="rerankType" name="rerankType" value="upload_date" id="rerank_upload_date" {upload_date_rrTypeChecked} />
+                        <label for="rerank_upload_date">by <span class="rrTypeRadio">upload_date</span></label>
+                    </td>
+                    <td>
+                        <div id="rerank_upload_date_detail" class="detail">
+
+                             <input type="text" id="date_input" class="date_input" name="date_input" value="{date_input}" /> --this doesnt work yet!
+                        </div>
                     </td>
                 </tr>
 
