@@ -41,31 +41,26 @@ function disable_all_rerank_details(how){
 
         
         if ($(controller_name).attr("checked")) {
-            //enable it right away
-            $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled');
             
+            $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled'); //if clicking fast, disable could be last, this fixes it
+
             //show it
             if(how != "fade") {
                 $(detail_name).show();
-                
             } else {
-                $(detail_name).fadeIn(1000, function(){
-                     $(detail_name + ' input, ' + detail_name + ' select').removeAttr('disabled'); //if clicking fast, disable could be last, this fixes it
-                });
-                
+                $(detail_name).fadeIn(1000);
             }
-            
+
              //alert("disRem:" + detail_name);
            
         } else {
             //hide it
+            $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
+
             if(how != "fade") {
                 $(detail_name).hide();
-                $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
             } else {
-                $(detail_name).fadeOut(1000, function(){ //disable later. so it seem enabled all the time, but is disabled when submitting
-                    $(detail_name + ' input, ' + detail_name + ' select').attr('disabled','disabled');
-                });
+                $(detail_name).fadeOut(1000);
             }
             
             
