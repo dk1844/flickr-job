@@ -24,7 +24,7 @@ class Search {
     public static $types = array(
         "text",
         "latest",
-    ); 
+    );
     public static $counts = array(
         1, 2, 5,
         10, 20, 50,
@@ -37,6 +37,13 @@ class Search {
     private $message;
     private $committed;
     private $searchCount;
+    public static $input_date_types = array(
+        "no_dates",
+        "from_only",
+        "to_only",
+        "from_to",
+    );
+    public $input_date_type;
 
     public function __construct(phpFlickr $f) {
         //set default
@@ -45,7 +52,7 @@ class Search {
         $this->message = '';
         $this->committed = false;
         $this->searchCount = self::DEFAULT_COUNT;
-
+        $this->input_date_type = self::$input_date_types[0];
     }
 
     public static function fixType($type) {
@@ -54,6 +61,13 @@ class Search {
 
         //set default type otherwise
         return self::$types[0];
+    }
+
+    public static function fixInputDateType($dtype) {
+        if (in_array($dtype, self::$input_date_types))
+            return $dtype;
+
+        return self::$input_date_types[0];
     }
 
     public static function fixCount($count) {
@@ -70,19 +84,59 @@ class Search {
 
     //search by date? Maybe if there's time.. probably not.
 
-    public function searchByKeyword($text) {
+    public function searchByKeyword() {
+        $text = $_REQUEST["input"];
+
         $args = array();
         $args['text'] = $text;
         $args['per_page'] = $this->getSearchCount();
         $args['extras'] = self::EXTRAS;
 
+
         if (empty($text)) {
             $this->setCommitted(false);
             $this->message = "<p>Input some keywords for this type of search, pls..</p>";
-        } else {
-            $result = $this->f->photos_search($args);
+            return;
         }
 
+        $this->setInputDateType($_REQUEST["input_date_type"]); //is fixed
+
+        //date specified?
+        switch ($this->getInputDateType()) {
+
+            //dates off
+            default:
+            case self::$input_date_types[0]:
+                //print "no dates set";
+                break;
+
+            case "from_only":
+                $args["min_upload_date"] = Helper::czStrToUnixDate($_REQUEST["input_date_from"]); //being fixed inside
+                break;
+
+            case "to_only":
+                $args["max_upload_date"] = Helper::czStrToUnixDate($_REQUEST["input_date_to"]); //being fixed inside
+                break;
+
+            case "from_to":
+                $from = Helper::czStrToUnixDate($_REQUEST["input_date_from"]);
+                $to = Helper::czStrToUnixDate($_REQUEST["input_date_to"]);
+
+                if ($from >= $to) {
+                    $this->setCommitted(false);
+                    $this->message = "<p>From date has to preceed the To Date!</p>";
+                    return;
+                }
+
+                $args["min_upload_date"] = $from;
+                $args["max_upload_date"] = $to;
+        }
+
+
+
+
+
+        $result = $this->f->photos_search($args);
         //debug
         //print "<pre>";
         //print_r($result);
@@ -98,6 +152,27 @@ class Search {
         $this->setResult($result);
     }
 
+    public function searchByDate() {
+
+
+        $args = array();
+
+        if (empty($from) && empty($to)) {
+            $args['min_upload_date'] = date("U") - 10 * 60; // last 10 min
+        } else {
+            if (!empty($from))
+                $args['min_upload_date'] = $from;
+            if (!empty($to))
+                $args['max_upload_date'] = $to;
+        }
+
+        $args['per_page'] = $count;
+        $args['extras'] = self::EXTRAS;
+
+        $result = $this->f->photos_search($args);
+        $this->setResult($result);
+    }
+
     public function genericSearch() {
         $this->resetMessage();
         $this->setType($_REQUEST["searchType"]); //being fixed inside!
@@ -108,7 +183,7 @@ class Search {
         switch ($this->getType()) {
             default :
             case "text":
-                $this->searchByKeyword($_REQUEST["input"]);
+                $this->searchByKeyword();
                 break;
 
             case "latest":
@@ -140,12 +215,10 @@ class Search {
                 //print "creating photo<br>";
                 $p = new Photo($ph_args, $this->f);
             } else {
-                  //print "creating video<br>";
-                 $p = new Video($ph_args, $this->f);
+                //print "creating video<br>";
+                $p = new Video($ph_args, $this->f);
             }
             //$p = new Media($ph_args, $this->f);
-            
-
             //add the media to the list
             $this->addResultMedia($p);
         }
@@ -215,6 +288,14 @@ class Search {
 
     public function setSearchCount($searchCount) {
         $this->searchCount = self::fixCount($searchCount);
+    }
+
+    public function getInputDateType() {
+        return $this->input_date_type;
+    }
+
+    public function setInputDateType($input_date_type) {
+        $this->input_date_type = self::fixInputDateType($input_date_type);
     }
 
 }
