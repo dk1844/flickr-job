@@ -151,21 +151,21 @@ class UI {
             return "<p> Search result empty, try different keywords or so.. </p>";
 
 
-        $out .= "<table style=\"border:1px dotted maroon;\"><tr>";
+        //$out .= "<table style=\"border:1px dotted maroon;\"><tr>";
 
         for ($index = 0; $index < count($array); $index++) {
             $one = $array[$index];
-
+		  /*
             if ($index % $table_w == 0 && $index != 0 && ($index) != count($array)) { //nasobek, neni 0. ani posledni
                 $out .= "</tr>\n<tr>";
-            }
+            }*/
 
-            $out .= "<td>";
+            $out .= "<div class='img_result'>";
 
             $out .= $this->createAImg($one) . "\n";
-            $out .= "</td>\n";
+            $out .= "</div>\n";
         }
-        $out .= "</tr>\n</table>\n";
+        $out .= "<div style='clear:both'></div>\n";
 
         return $out;
     }
