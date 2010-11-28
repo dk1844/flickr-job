@@ -1,5 +1,5 @@
 <?php
-
+ini_set("display_errors", "0");
 //--------------------import--------------------
 require_once('./classes/Config.php');
 require_once('./classes/phpFlickr.php');
