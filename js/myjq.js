@@ -150,6 +150,10 @@ function hide_show_dates(chosentype, how) {
     }
 }
 
+function infoFade(elem){
+	$("#"+elem).hide();
+}
+
     $(document).ready(function(){
 
         //set init;
@@ -193,6 +197,10 @@ function hide_show_dates(chosentype, how) {
             //disables and hides everything but actually selected!
             disable_all_rerank_details("fade");
 
+        });
+        
+        $('label.popis').click(function(){
+        	infoFade($('label.popis').attr("for"));
         });
 
 

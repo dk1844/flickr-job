@@ -16,6 +16,8 @@ class UI {
     private $page;
     private $search;
     private $rerank;
+    
+    private $img_counter = 0;
 
     //to be defined somewhere else or loaded from ..?
     const PAGE_TPL_LOCATION = "./tpl/page.tpl.xhtml";
@@ -96,12 +98,14 @@ class UI {
 
         if ($this->search->isCommitted()) {
             //generate output
+            $this->img_counter = 0;
             $output_imgs = $this->createAImgsTable($this->search->getResultMedias());
             $heading = "";
             $output = $heading . $output_imgs;
         } else {
             $output = "";
         }
+        
         $page = str_replace("{outputBlock}", $output, $page);
 
         $this->page = $page;
@@ -109,17 +113,19 @@ class UI {
 
     public function createAImg(Media $p) {
         $out = "";
-        $out = "<h4>" . $p->getTitle() . "</h4>";
+        $out = "<h4 title='".$p->getTitle()."'>" . mb_substr($p->getTitle(),0,40,'utf8');
+	   if(mb_strlen($p->getTitle(),'utf8')>40) $out .= '...';
+	   $out .= "</h4>";
 
         $img = "<img src=\"" . $p->getThumbnailSrc() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getDirectUrl() . "\" >" . $img . "</a><br/>\n";
         $out .= "<a href=\"" . $p->getPageUrl() . "\" >" . "original " . $p->getMediaType() . "</a><br/><br />\n";
 
-        $out .= "<div class='popis'>Max size: <span title=\"" . $p->getDimensions()->getName() .  "\">".
-                $p->getDimensions()->getWidth() . "x" . $p->getDimensions()->getHeight() . "</span><br/>" ;
+        $out .= "<label for='popis".$this->img_counter."' class='popis pointer' style='font-weight:bold'>Info</label><div class='popis' id='popis".$this->img_counter."'><table><tr><th>Max size:</th><td><span title=\"" . $p->getDimensions()->getName() .  "\">".
+                $p->getDimensions()->getWidth() . "x" . $p->getDimensions()->getHeight() . "</span></td></tr>" ;
 
-        $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
-        $out .= "Upload date: " . date("j.n.Y H:i", $p->getDateUpload()) ."</div>\n";
+        $out .= "<tr><th>Views:</th><td>" . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."</td></tr>\n";
+        $out .= "<tr><th>Upload date:</th><td>" . date("j.n.Y H:i", $p->getDateUpload()) ."</td></tr>";
 
        // if($this->rerank->getViews_point() != 0) {
        //     $out .= "ViewsDiff: " . $p->getViewsDiff() ."<br/>\n";
@@ -128,7 +134,7 @@ class UI {
         if ($p->getGeo()->isValid()) {
             $lat = round($p->getGeo()->getLatitude(), UI::GEO_UI_PRECISION);
             $long = round($p->getGeo()->getLongitude(), UI::GEO_UI_PRECISION);
-            $out .= "<span class=\"geo_data\" title=\"Geographic data (&lt;latitude&gt;;&lt;logitude&gt;)\">($lat;$long)</span><br />";
+            $out .= "<tr><th></th><td><span class=\"geo_data\" title=\"Geographic data (&lt;latitude&gt;;&lt;logitude&gt;)\">($lat;$long)</span></td></tr>";
 
             if ($this->rerank->getLocal_geo()->isValid()) {
                 $out .= "Distance = " . round($p->getRrDistance(),UI::GEO_UI_PRECISION) . "km";
@@ -137,9 +143,10 @@ class UI {
 
 
         if ($this->rerank->getType() == "title_similarity") {
-            $out .= "title_similarity = " . $p->getTitleSimilarity() . "<br/>\n";
+            $out .= "<tr><th>Title similarity</th><td>" . $p->getTitleSimilarity() . "</td></tr>\n";
         }
-
+        $out .= "</table></div>\n";
+	   $this->img_counter++;
         return $out;
     }
 
