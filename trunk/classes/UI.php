@@ -97,10 +97,10 @@ class UI {
         if ($this->search->isCommitted()) {
             //generate output
             $output_imgs = $this->createAImgsTable($this->search->getResultMedias());
-            $heading = "<h1>Here it is:</h1>\n";
+            $heading = "";
             $output = $heading . $output_imgs;
         } else {
-            $output = "<p>Start the search!</p>";
+            $output = "";
         }
         $page = str_replace("{outputBlock}", $output, $page);
 
@@ -113,13 +113,13 @@ class UI {
 
         $img = "<img src=\"" . $p->getThumbnailSrc() . "\" alt=\"" . htmlspecialchars($p->getTitle()) . "\"  />";
         $out .= "<a href=\"" . $p->getDirectUrl() . "\" >" . $img . "</a><br/>\n";
-        $out .= "<a href=\"" . $p->getPageUrl() . "\" >" . "original " . $p->getMediaType() . "</a><br/>\n";
+        $out .= "<a href=\"" . $p->getPageUrl() . "\" >" . "original " . $p->getMediaType() . "</a><br/><br />\n";
 
-        $out .= "Max size: <span title=\"" . $p->getDimensions()->getName() .  "\">".
+        $out .= "<div class='popis'>Max size: <span title=\"" . $p->getDimensions()->getName() .  "\">".
                 $p->getDimensions()->getWidth() . "x" . $p->getDimensions()->getHeight() . "</span><br/>" ;
 
         $out .= "Views: " . $p->getViews() . "<span class=\"help\" title=\"Because we cache...\">+</span>" ."<br/>\n";
-        $out .= "Upload date: " . date("j.n.Y H:i", $p->getDateUpload()) ."<br/>\n";
+        $out .= "Upload date: " . date("j.n.Y H:i", $p->getDateUpload()) ."</div>\n";
 
        // if($this->rerank->getViews_point() != 0) {
        //     $out .= "ViewsDiff: " . $p->getViewsDiff() ."<br/>\n";
