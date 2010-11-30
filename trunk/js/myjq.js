@@ -13,7 +13,7 @@ function rerank_disable(how){
         });
     }
     
-    //$("rerank_cb").click();
+//$("rerank_cb").click();
 
 }
 
@@ -26,7 +26,7 @@ function rerank_enable(how) {
     $("#rr_fieldset").attr("class", "expanded")
     $("#rr_details input, #rr_details select").removeAttr('disabled');
     disable_all_rerank_details(); //fixes unchanged value from the last time!
-    //$("rerank_cb").click();
+//$("rerank_cb").click();
 
 }
 
@@ -51,7 +51,7 @@ function disable_all_rerank_details(how){
                 $(detail_name).fadeIn(1000);
             }
 
-            //alert("disRem:" + detail_name);
+        //alert("disRem:" + detail_name);
            
         } else {
             //hide it
@@ -122,7 +122,7 @@ function enable_date(which, how) {
 
 function hide_show_dates(chosentype, how) {
     // input_date_types form jsHelper php (generated)
- //alert(chosentype);
+    //alert(chosentype);
     switch(chosentype)
     {
         //no dates at al
@@ -151,60 +151,79 @@ function hide_show_dates(chosentype, how) {
 }
 
 function infoFade(elem){
-	$("#"+elem).hide();
+    $("#"+elem).hide();
 }
 
-    $(document).ready(function(){
+$(document).ready(function(){
 
-        //set init;
-        if (!$('#rerank_cb').attr("checked")) {
-            rerank_disable();
-        }
-        //details hide
-        disable_all_rerank_details();
+    //set init;
+    if (!$('#rerank_cb').attr("checked")) {
+        rerank_disable();
+    }
+    //details hide
+    disable_all_rerank_details();
 
-        //setup date input;
-        my_date_input_extend();
-        $(".date_input").date_input();
+    //setup date input;
+    my_date_input_extend();
+    $(".date_input").date_input();
 
-        //setup dates init
-        var init_date_type =  $('#input_date_type').val();
-        hide_show_dates(init_date_type); //fast
-
-
+    //setup dates init
+    var init_date_type =  $('#input_date_type').val();
+    hide_show_dates(init_date_type); //fast
 
 
-        //----------functions----------------------
-
-        $('#input_date_type').change(function(){
-           hide_show_dates( $('#input_date_type').val(), "fade");
-           //alert("hi");
-
-        });
-  
-        $('#rerank_cb').change(function () {
-            if ($('#rerank_cb').attr("checked")) {
-                rerank_enable("fade");
-                return;
-            }
-            rerank_disable("fade");
-            //Here do the stuff you want to do when 'unchecked'
-        });
 
 
-        $('.rerankType').change(function () {
-       
-            //disables and hides everything but actually selected!
-            disable_all_rerank_details("fade");
+    //----------functions----------------------
 
-        });
-        
-        $('label.popis').click(function(){
-        	infoFade($('label.popis').attr("for"));
-        });
+    $('#input_date_type').change(function(){
+        hide_show_dates( $('#input_date_type').val(), "fade");
+    //alert("hi");
 
-
-        // -------------------------------------done--------------------
     });
+  
+    $('#rerank_cb').change(function () {
+        if ($('#rerank_cb').attr("checked")) {
+            rerank_enable("fade");
+            return;
+        }
+        rerank_disable("fade");
+    //Here do the stuff you want to do when 'unchecked'
+    });
+
+
+    $('.rerankType').change(function () {
+       
+        //disables and hides everything but actually selected!
+        disable_all_rerank_details("fade");
+
+    });
+
+    //jednoduche skryvani
+    /*       $('label.popis').click(function(){
+        	//infoFade($this.attr("for"));
+               var id = $(this).attr("for");
+               $('#' + id).toggle();
+        });
+     */
+
+    //jednoduche skryvani
+    $('label.popis').toggle(
+        function(){
+            //infoFade($this.attr("for"));
+            var id = $(this).attr("for");
+            $('#' + id).fadeOut(1000)
+        },
+        
+        function(){
+            //infoFade($this.attr("for"));
+            var id = $(this).attr("for");
+            $('#' + id).fadeIn(1000);
+        }
+        );
+
+
+// -------------------------------------done--------------------
+});
 
 
