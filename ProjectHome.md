@@ -1,0 +1,1 @@
+flickr reranking for edu purposes @ CTU FIT using FlicrAPI & phpFlickr wrapper in PHP
